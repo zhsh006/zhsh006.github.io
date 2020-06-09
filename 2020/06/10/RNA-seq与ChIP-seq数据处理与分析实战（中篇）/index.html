@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>RNA-seq与ChIP-seq数据处理与分析实战（中篇） | 七星传</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="ChIP-seq 基本原理染色体免疫共沉淀（ChIP ,Chromatin Immunoprecipitation）结合高通量测序技术（NGS）用于分析转录因子，以及其他染色质相关蛋白影响生物体表型变化的机制。研究DNA与蛋白质互作如何调节基因表达对于理解许多生物学过程以及疾病的发生机制具有重要意义。ChIP-seq当前主要应用于两个方面：一方面，转录因子与DNA序列的相互作用识别位点（启动子，增">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RNA-seq与ChIP-seq数据处理与分析实战（中篇）">
+<meta property="og:url" content="http://yoursite.com/2020/06/10/RNA-seq%E4%B8%8EChIP-seq%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B8%8E%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%AD%E7%AF%87%EF%BC%89/index.html">
+<meta property="og:site_name" content="七星传">
+<meta property="og:description" content="ChIP-seq 基本原理染色体免疫共沉淀（ChIP ,Chromatin Immunoprecipitation）结合高通量测序技术（NGS）用于分析转录因子，以及其他染色质相关蛋白影响生物体表型变化的机制。研究DNA与蛋白质互作如何调节基因表达对于理解许多生物学过程以及疾病的发生机制具有重要意义。ChIP-seq当前主要应用于两个方面：一方面，转录因子与DNA序列的相互作用识别位点（启动子，增">
+<meta property="og:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-184519.png">
+<meta property="og:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-184524.png">
+<meta property="og:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-184521.png">
+<meta property="og:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-184522.png">
+<meta property="og:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-184523.png">
+<meta property="og:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-184525.png">
+<meta property="article:published_time" content="2020-06-09T18:41:15.000Z">
+<meta property="article:modified_time" content="2020-06-09T18:45:25.307Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="网络摘抄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-184519.png">
+  
+    <link rel="alternate" href="/atom.xml" title="七星传" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">七星传</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-RNA-seq与ChIP-seq数据处理与分析实战（中篇）" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/06/10/RNA-seq%E4%B8%8EChIP-seq%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B8%8E%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%AD%E7%AF%87%EF%BC%89/" class="article-date">
+  <time datetime="2020-06-09T18:41:15.000Z" itemprop="datePublished">2020-06-10</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      RNA-seq与ChIP-seq数据处理与分析实战（中篇）
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="ChIP-seq-基本原理"><a href="#ChIP-seq-基本原理" class="headerlink" title="ChIP-seq 基本原理"></a>ChIP-seq 基本原理</h4><p>染色体免疫共沉淀（ChIP ,Chromatin Immunoprecipitation）结合高通量测序技术（NGS）用于分析转录因子，以及其他染色质相关蛋白影响生物体表型变化的机制。研究DNA与蛋白质互作如何调节基因表达对于理解许多生物学过程以及疾病的发生机制具有重要意义。ChIP-seq当前主要应用于两个方面：一方面，转录因子与DNA序列的相互作用识别位点（启动子，增强子等各种顺式作用元件）的研究；另一方面主要应用在表观遗传学领域，组蛋白修饰与核小体定位等。</p>
+<p>对于组蛋白修饰语ChIP-seq的研究 。组蛋白修饰是基因激活或者抑制的重要指示器，组蛋白修饰存在于基因表达的调控区域如启动子，增子等。基因的激活表达一般与转录起始位点组蛋白H3K4me3和H3K27ac修饰密切相关，且活跃的增强子能够被H3K4me1和H3K27ac富集鉴定。活跃转录基因的基因体与H3K36me3相关。基因抑制能够通过包含H3K9me3和H3K27me3的两种不同机制介导。基因的表达与否以及表达水平是通过多个组蛋白修饰相互拮抗共同作用的结果。利用染色体免疫共沉淀对已知具有激活或抑制功能的组蛋白修饰marker进行靶定，根据相应组蛋白修饰表达水平的上调或下调来研究预测基因的激活或者抑制。</p>
+<h3 id="ChIP-seq-建库测序"><a href="#ChIP-seq-建库测序" class="headerlink" title="ChIP-seq 建库测序"></a>ChIP-seq 建库测序</h3><ul>
+<li><p><strong>染色体免疫共沉淀建库测序流程</strong></p>
+<p><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-184519.png" alt="image-20191221063057853"></p>
+</li>
+</ul>
+<center>ChIP-seq 建库流程</center>
+
+<p><strong>a.</strong>甲醛交联整个细胞系使得目标蛋白与染色质紧密连接</p>
+<p><strong>b.</strong>使用超声波或者MNase酶降解等方法将基因组DNA打成小片段</p>
+<p><strong>c.</strong>添加与目标蛋白特异的抗体进行孵育，与目标蛋白形成免疫沉淀结合复合物结合在beads上</p>
+<p><strong>d.</strong>沉淀洗脱，富集与目标蛋白结合的DNA序列</p>
+<p><strong>e.</strong>蛋白酶K解交联，纯化DNA</p>
+<p><strong>f-g.</strong>PCR扩增准备测序</p>
+<h3 id="CHIP-seq数据分析"><a href="#CHIP-seq数据分析" class="headerlink" title="CHIP-seq数据分析"></a>CHIP-seq数据分析</h3><ul>
+<li><p><strong>基本流程</strong></p>
+<p><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-184524.png" alt="image-20191221063340054"></p>
+</li>
+</ul>
+<center>ChIP-seq 分析流程</center>
+
+<p>（1） 质控。与RNA-seq数据分析流程类似，ChIP-seq获得的原始数据首先需要使用fastQC进行质量检测，并对不合格的数据进行进一步处理</p>
+<p>（2） Mapping reads。Bowtie将测序获得的reads序列比对到参考基因组上，获得sam或者bam格式的比对文件，获得reads的位置信息。使用samtools软件对比对结果进行排序，以及去除PCR重复，获得最终可以进行下游分析的数据</p>
+<p>（3） Peak calling。使用MACS2获得ChIP-seq富集信息,生成bed文件中详细列出了每一个reads的位置信息与可信度</p>
+<p>（4） IGV可视化基因位置信息.为了 减少bam文件的大小从而在IGV可视化过程中降低计算机资源的消耗，需要将bam文件转化为BigWig文件或者tdf格式文件</p>
+<p>（5） 下游信息挖掘。使用R-packages Chipseeker对处理好的数据进行进一步的信息挖掘与可视化；Metascape进行GO Annotation</p>
+<h2 id="分析代码"><a href="#分析代码" class="headerlink" title="分析代码"></a>分析代码</h2><h5 id="1、数据获取"><a href="#1、数据获取" class="headerlink" title="1、数据获取"></a>1、数据获取</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fastq-dump --split-3 -gzip SRR*</span><br></pre></td></tr></table></figure>
+
+<h5 id="2、质控检测"><a href="#2、质控检测" class="headerlink" title="2、质控检测"></a>2、质控检测</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fastqc -t 20 -o $CHIPseq&#x2F;fastqc $CHIPseq&#x2F;rawdata&#x2F;MCF*.fastq.gz</span><br></pre></td></tr></table></figure>
+
+<h5 id="3、匹配基因组序列"><a href="#3、匹配基因组序列" class="headerlink" title="3、匹配基因组序列"></a>3、匹配基因组序列</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bowtie-build &#x2F;picb&#x2F;epigenome&#x2F;data&#x2F;genome&#x2F;hg19&#x2F;hg19.fa index#构建比对模板#保存文件$CHIPseq&#x2F;Align&#x2F;bowtie.shfor i in &#96;cat id&#96;; do gzip -d $CHIPseq&#x2F;rawdata&#x2F;$i.fastq.gz ;done #将下载的fastq.gz文件解压（-d）for i in &#96;cat id&#96;; do bowtie -S -q -p 20 &#x2F;picb&#x2F;epigenome&#x2F;data&#x2F;genome&#x2F;bowtie_indexes&#x2F;hg19 $CHIPseq&#x2F;rawdata&#x2F;$i.fastq &gt; $i.sam ; done #-S 输出sam文件#-q 输入文件for i in &#96;cat id&#96;; do samtools sort $i.sam &gt; $i.bam;done #将sam文件进行排序并生成bam文件输出#-U 表示为single单端测序#-x 后面输入index文件#-S 表示输出的sam文件for i in &#96;cat id&#96;; do samtools rmdup $i.bam rm$i.bam;done  #去重复for i in &#96;cat id&#96;; do samtools index rm$i.bam ;done   #生成后缀为.bai的index文件用于后面macs2进行peak calling</span><br></pre></td></tr></table></figure>
+
+<h5 id="4、Call-Peaks"><a href="#4、Call-Peaks" class="headerlink" title="4、Call Peaks"></a>4、Call Peaks</h5><p>本实验数据主要是在研究组蛋白H3K27ac修饰对于调节基因的表达情况，组蛋白修饰作为表观遗传学研究的重要标签对于基因表达的激活或抑制具有重要的指示作用。H3K27ac修饰是非常重要的基因激活表达标签，对数据进行peak-calling就是要找出H3K27ac修饰增加的位点从而找到相对于正常的乳腺细胞，在乳腺癌细胞中表达上调的基因。</p>
+<p>对于热点的定义有着严格的统计学意义，这些热点位置多次被测得的reads所覆盖且可近似认为其服从泊松分布.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">macs2 callpeak -t rmMCF7H3K27ac_N1.bam rmMCF7H3K27ac_N2.bam -c rmMCF7_IN_N.bam -g hs -n H3K27</span><br><span class="line">macs2 callpeak -t rmMCF7_CTCF_N1.bam rmMCF7_CTCF_N2.bam -c rmMCF7_IN_N.bam -g hs -n CTCF</span><br></pre></td></tr></table></figure>
+
+<h5 id="5、Peak-Annotation"><a href="#5、Peak-Annotation" class="headerlink" title="5、Peak Annotation"></a>5、Peak Annotation</h5><figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">library</span>(ChIPseeker)</span><br><span class="line"><span class="comment">#读入数据CTCF&lt;-readPeakFile('CTCF_peaks.narrowPeak',head=F)</span></span><br><span class="line">CTCF&lt;-CTCF[,c(<span class="number">1</span>,<span class="number">6</span>)]H3K27&lt;-readPeakFile(<span class="string">'H3K27_peaks.narrowPeak'</span>,head=<span class="literal">F</span>)H3K27&lt;-H3K27[,c(<span class="number">1</span>,<span class="number">6</span>)]peaklist&lt;-list(<span class="string">'CTCF'</span>=CTCF,<span class="string">'H3K27'</span>=H3K27)</span><br><span class="line"><span class="comment">#对promoter进行注释</span></span><br><span class="line"><span class="keyword">library</span>(TxDb.Hsapiens.UCSC.hg19.knownGene)promoter&lt;-getPromoters(TxDb =TxDb.Hsapiens.UCSC.hg19.knownGene )</span><br><span class="line"><span class="comment">#把peak Align到窗口上生成矩阵；单独作图</span></span><br><span class="line">CTCFMatrix&lt;-getTagMatrix(CTCF,windows = promoter)H3K27Matrix&lt;-getTagMatrix(H3K27,windows = promoter)</span><br><span class="line"><span class="comment">#distribution of promoter </span></span><br><span class="line">tagHeatmap(CTCFMatrix,xlim = c(-<span class="number">1000</span>,<span class="number">1000</span>),color = <span class="string">'#e79686'</span>,title = <span class="string">'CTCF'</span>)tagHeatmap(H3K27Matrix,xlim = c(-<span class="number">1000</span>,<span class="number">1000</span>),color = <span class="string">'#E7475E'</span>,title = <span class="string">'H3K27'</span>)</span><br><span class="line"><span class="comment">#合并比较作图</span></span><br><span class="line">pdf(<span class="string">'Promoter Distribution.pdf'</span>)</span><br><span class="line">peakHeatmap(peaklist,weightCol = <span class="string">'V9'</span>,TxDb = TxDb.Hsapiens.UCSC.hg19.knownGene,upstream = <span class="number">4000</span>,downstream = <span class="number">4000</span>,color = <span class="string">'#4e709d'</span>)</span><br><span class="line">dev.off()</span><br><span class="line"><span class="comment">#degree of combination展示结合强度,peak结合的数目越多说明结合强度越大</span></span><br><span class="line">plotAvgProf(CTCFMatrix,xlim = c(-<span class="number">1000</span>,<span class="number">1000</span>),xlab=<span class="string">'Genomic Region (5`-&gt;3`)'</span>,ylab=<span class="string">'CTCF Read Count frequency'</span>)</span><br><span class="line">plotAvgProf(H3K27Matrix,xlim = c(-<span class="number">1000</span>,<span class="number">1000</span>),xlab=<span class="string">'Genomic Region (5`-&gt;3`)'</span>,ylab=<span class="string">'h3k27 Read Count frequency'</span>)</span><br><span class="line"><span class="comment">#合并作图</span></span><br><span class="line">tagMatrixlist&lt;-lapply(peaklist,getTagMatrix,windows=promoter)</span><br><span class="line">pdf()</span><br><span class="line">plotAvgProf(tagMatrixlist,xlim = c(-<span class="number">1000</span>,<span class="number">1000</span>),facet =<span class="string">'col'</span>)</span><br><span class="line">dev.off()</span><br><span class="line"><span class="comment">#读入peak数据</span></span><br><span class="line"><span class="keyword">library</span>(ChIPseeker)</span><br><span class="line">CTCF&lt;-readPeakFile(<span class="string">'CTCF_peaks.narrowPeak'</span>,head=<span class="literal">F</span>)</span><br><span class="line">H3K27&lt;-readPeakFile(<span class="string">'H3K27_peaks.narrowPeak'</span>,head=<span class="literal">F</span>)</span><br><span class="line"><span class="comment">#生成注释文件</span></span><br><span class="line">CTCFAnno &lt;-annotatePeak(CTCF,tssRegion = c(-<span class="number">2000</span>,<span class="number">2000</span>),TxDb = TxDb.Hsapiens.UCSC.hg19.knownGene)</span><br><span class="line">H3K27Anno &lt;-annotatePeak(H3K27,tssRegion = c(-<span class="number">2000</span>,<span class="number">2000</span>),TxDb = TxDb.Hsapiens.UCSC.hg19.knownGene)</span><br><span class="line">Annolist&lt;-list(<span class="string">'CTCF'</span>=CTCF,<span class="string">'H3K27'</span>=H3K27)</span><br><span class="line"><span class="comment">#绘制饼图可视化peakannotation分布</span></span><br><span class="line">plotAnnoPie(CTCFAnno)plotAnnoPie(H3K27Anno)</span><br><span class="line"><span class="comment">#multiply Annotation/peak</span></span><br><span class="line">vennpie(CTCFAnno)</span><br><span class="line">vennpie(H3K27Anno)</span><br><span class="line">pdf(<span class="string">'CTCFAnno.pdf'</span>,width = <span class="number">15</span>,height = <span class="number">15</span>)</span><br><span class="line">upsetplot(CTCFAnno,vennpie=<span class="literal">TRUE</span>)</span><br><span class="line">dev.off()</span><br><span class="line">pdf(<span class="string">'H3K27Anno.pdf'</span>)</span><br><span class="line">upsetplot(H3K27Anno,vennpie=<span class="literal">TRUE</span>)</span><br><span class="line">dev.off()</span><br><span class="line"><span class="comment">#the nearist gene annotation</span></span><br><span class="line">plotDistToTSS(CTCFAnno,title = <span class="string">'Distribution of transtcription factor-binding loci\nrelative to TSS $CTCF'</span>)</span><br><span class="line">plotDistToTSS(H3K27Anno,title = <span class="string">'Distribution of transtcription factor-binding loci\nrelative to TSS $H3K27'</span>)</span><br><span class="line"><span class="comment">#一张图展示数据</span></span><br><span class="line">peakAnnoList&lt;-lapply(peaklist,annotatePeak,TxDb=TxDb.Hsapiens.UCSC.hg19.knownGene,tssRegion=c(-<span class="number">1000</span>,<span class="number">1000</span>))</span><br><span class="line">plotDistToTSS(peakAnnoList)</span><br><span class="line"><span class="comment">###富集分析绘制气泡图</span></span><br><span class="line"><span class="keyword">library</span>(clusterProfiler)</span><br><span class="line">genes=lapply(peaklist, <span class="keyword">function</span>(i) seq2gene(i,c(-<span class="number">1000</span>,<span class="number">1000</span>),<span class="number">1000</span>,TxDb = TxDb.Hsapiens.UCSC.hg19.knownGene))</span><br><span class="line">cc=compareCluster(geneClusters = genes,fun=<span class="string">'enrichKEGG'</span>,organism=<span class="string">'hsa'</span>)</span><br><span class="line">dotplot(cc,showCategory=<span class="number">10</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="结果与分析"><a href="#结果与分析" class="headerlink" title="结果与分析"></a>结果与分析</h2><h4 id="Promoter-Distribution"><a href="#Promoter-Distribution" class="headerlink" title="Promoter Distribution"></a>Promoter Distribution</h4><p>组蛋白H3K27ac作为激活基因表达的组蛋白Marker一搬位于启动子区域用于调控激活基因的表达，CTCF是一种转录因子其结合位点一般位于绝缘子区域。故对序列比对之后的reads在启动子区域的分布情况进行可视化展示，如Figure11。对图A展示了CTCF转录因子与H3K27ac修饰在启动子周围的分布。他们有着不同的分布模式，H3K27ac在TSS转录起始位点分布比较集中且覆盖范围较广；CTC转录因子在TSS区域也存在结合但是结合位点分布范围较窄；图B展示了CTCF转录因子与H3K27ac修饰在TSS附近的结合强度。CTCF转录因子在TSS附近启动子结合强度较大且集中，在TSS附近结合的范围较窄；H3K27ac在TSS附近一个相对比较宽的区域都有较强的结合.图C与图B传递了相同的信息，CTCF转录因子与H3K27ac修饰相对于TSS不同距离的分布情况，相比较于CTCF转录因子，H3K27ac修饰在TSS区域有更广的结合范围与更强的结合强度.</p>
+<p><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-184521.png" alt="image-20191221063940135"></p>
+<h5 id="Pie-plot"><a href="#Pie-plot" class="headerlink" title="Pie plot"></a>Pie plot</h5><p>对CTCF转录因子结合位点与H3K27ac修饰位点在基因结构上分布情况进行注释；A图为CTCF转录因子结合位点的分布，大部分注释在远端基因间区，启动子区；B图为H3K27ac修饰结果与CTCF转录因子相似，但是在启动子区域注释更加显著。</p>
+<p><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-184522.png" alt="image-20191221063959179"></p>
+<h5 id="UpSet-plot"><a href="#UpSet-plot" class="headerlink" title="UpSet plot"></a>UpSet plot</h5><p>考虑同一个基因可能存在多个reads注释到基因结构的不同位点的情况，只是进行饼图的绘制不能够详细的体现这种情况的发生。进一步做了分布位点注释图Figure13。图A表示CTCF转录因子结合位点 的注释情况，纵轴表示注释到的基因数目，横轴相应的基因结构位点 。比如对于A图CTCF转录因子结合位点有3511个基因同时在5`UTR，启动子区，外显子和内含子区域都有相应的reads进行注释。</p>
+<p><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-184523.png" alt="image-20191221064029885"></p>
+<p>Bubble plot for GO enrichment</p>
+<p>对获得的数据进行功能的注释，该热图展示了CTCF转录因子与H3K27ac修饰所调节基因的功能富集情况。气泡的大小代表所占基因的比例，气泡越大说明所富集的基因数目越多；气泡的颜色表示可信度，红色代表可信度较高，蓝色代表具有较低的可信度。</p>
+<p>CTCF转录因子所调控的基因与H3K27ac修饰调控的基因表达在人类乳头瘤病毒感染，MAPK信号通路中都有较高的富集。</p>
+<p><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-184525.png" alt="image-20191221064057857"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/06/10/RNA-seq%E4%B8%8EChIP-seq%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B8%8E%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%AD%E7%AF%87%EF%BC%89/" data-id="ckb8a0z8d000l1lhjejlo5sey" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E6%91%98%E6%8A%84/" rel="tag">网络摘抄</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/06/10/RNA-seq%E4%B8%8EChIP-seq%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B8%8E%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%8A%E7%AF%87%EF%BC%89/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          RNA-seq与ChIP-seq数据处理与分析实战（上篇）
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/06/10/ChIP-Seq%E5%88%86%E6%9E%90%E5%B0%8F%E5%AE%9E%E6%88%98%EF%BC%88%E4%BA%8C%EF%BC%89/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">ChIP-Seq分析小实战（二）</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux%E8%BD%AF%E4%BB%B6/" rel="tag">Linux软件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E6%91%98%E6%8A%84/" rel="tag">网络摘抄</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Linux%E8%BD%AF%E4%BB%B6/" style="font-size: 10px;">Linux软件</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E6%91%98%E6%8A%84/" style="font-size: 20px;">网络摘抄</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/06/10/RNA-seq%E4%B8%8EChIP-seq%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B8%8E%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%8A%E7%AF%87%EF%BC%89/">RNA-seq与ChIP-seq数据处理与分析实战（上篇）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/RNA-seq%E4%B8%8EChIP-seq%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B8%8E%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%AD%E7%AF%87%EF%BC%89/">RNA-seq与ChIP-seq数据处理与分析实战（中篇）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/ChIP-Seq%E5%88%86%E6%9E%90%E5%B0%8F%E5%AE%9E%E6%88%98%EF%BC%88%E4%BA%8C%EF%BC%89/">ChIP-Seq分析小实战（二）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/ChIP-Seq%E5%88%86%E6%9E%90%E5%B0%8F%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%80%EF%BC%89/">ChIP-Seq分析小实战（一）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/BETA%E8%BD%AF%E4%BB%B6%E7%9A%84%E6%95%B4%E5%90%88Chip-seq%E5%92%8CRNA-seq/">BETA软件的整合Chip-seq和RNA-seq</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>七星传</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="七星传">
+<meta property="og:url" content="http://yoursite.com/page/2/index.html">
+<meta property="og:site_name" content="七星传">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="七星传" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">七星传</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-ChIP-seq基础入门" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/06/10/ChIP-seq%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" class="article-date">
+  <time datetime="2020-06-09T18:34:23.000Z" itemprop="datePublished">2020-06-10</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/10/ChIP-seq%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/">ChIP-seq基础入门</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><strong>理解ChIP-Seq</strong></p>
+<p>到了目前这个水平，我学习新的高通量数据分析流程时已经不再考虑代码应该如何写的问题了。我更多要去考虑一个技术的目的和意义。</p>
+<p>转录组主要研究的问题是基因在不同情况下的差异表达以及RNA结构变化等，而表观组研究的问题是在基因序列不变的情况下，基因的表达、调控和性状发生了<strong>可遗传变化</strong>的分子机制。也就是相同的DNA, RNA，蛋白质经过一定的修饰后会使得生物性状发生了改变。</p>
+<p>ChIP-Seq仅仅是第一个表观遗传学领域比较成熟的技术而已，目前还有很多其他的技术，比如说</p>
+<ul>
+<li>DNA修饰: DNA甲基化免疫共沉淀技术（MeDIP), 目标区域甲基化，全基因组甲基化（WGBS)，氧化-重亚硫酸盐测序（oxBS-Seq), TET辅助重亚硫酸盐测序（TAB-Seq）</li>
+<li>RNA修饰: RNA甲基化免疫共沉淀技术（MeRIP)</li>
+<li>蛋白质与核酸相互作用： RIP-Seq, ChIP-Seq, CLIP-Seq</li>
+<li>还有最近比较火的ATAC-Seq</li>
+</ul>
+<p>2013年PNAS上面有一篇文章叫做 <em><a href="http://www.pnas.org/content/110/18/7101.long" target="_blank" rel="noopener">Epigenetics: Core misconcept</a></em> 讲了几点关于表观遗传学,大家的理解错误的地方。</p>
+<p>本次主要是分析ChIP-Seq的高通量测序结果，因此，先介绍什么是ChIP-Seq.</p>
+<p>所谓的ChIP-Seq其实就是把ChIP实验做完得到的DNA不仅仅用来跑胶，还送去高通量测序了。重点在于ChIP，也就是染色体免疫共沉淀（Chromatin Immunoprecipitation）是用来解决什么科学问题的。毕竟数据分析不是目的，它只是解决问题的一种手段。</p>
+<blockquote>
+<p>ChIP被用来研究细胞内DNA与蛋白质相互作用，具体来说就是确定特定蛋白（如转录因子）是否结合特定基因组区域（如启动子或其它DNA结合位点）——可能定义顺反组。ChIP还被用来确定基因组上与组蛋白修饰相关的特定位点（即组蛋白修饰酶类的靶标） - 来自维基百科。</p>
+</blockquote>
+<p>ChIP的实验我从来没有做过，所以只能从网上找来大致的流程，简单分为</p>
+<p>第一步： 将蛋白交联到DNA上。 也就是保证蛋白和DNA能够结合，找到互作位点。</p>
+<p>第二步： 通过超声波剪切DNA链。</p>
+<p>第三步： 加上附上抗体的磁珠用于免疫沉淀靶蛋白。抗体很重要</p>
+<p>第四步： 接触蛋白交联；纯化DNA</p>
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-8831-2013053-d09d27cbc6fa4c82.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183753.png" alt="ChIP-seq基础入门"></a></p>
+<p>实验流程</p>
+<p>如果送去测序就是ChIP-Seq, 后续就是对应分析流程，分析分为4步：</p>
+<ul>
+<li>质量控制， 用到的是FastQC</li>
+<li>序列比对，Bowtie2或这BWA</li>
+<li>peak calling, 建议用MACS</li>
+<li>peak注释， 推荐Y叔的ChIPseeker</li>
+</ul>
+<h2 id="文章中ChIP-Seq解决的问题"><a href="#文章中ChIP-Seq解决的问题" class="headerlink" title="文章中ChIP-Seq解决的问题"></a>文章中ChIP-Seq解决的问题</h2><p>这部分看看这篇文章想解决什么问题，以及ChIP-Seq解决了什么问题。工具一定要为目的服务。</p>
+<p>PS: 可以先去把数据下载了，再看这个部分</p>
+<p><strong>文章的研究内容：</strong></p>
+<p>PRC1(Polycomb repressive complex 1)与干细胞命运决定有关。PRC1的组成非常的复杂，原文这样写道：</p>
+<blockquote>
+<p>The protein families that constitute the core of PRC1 contain several members: Cbx (Cbx2, Cbx4, Cbx6, Cbx7, or Cbx8); Ring1A or Ring1B; PHC (PHC1, PHC2, or PHC3); PCGF (PCGF1, PCGF2, PCGF3, PCGF4, PCGF5, or PCGF6); and RYBP or YAF2. Each combination establishes the subtype of PRC1 complexes</p>
+</blockquote>
+<p>文章想解决的问题是：</p>
+<ol>
+<li>PRC1复合体两类亚型的全基因组定位</li>
+<li>两类复合体调节的基因表达是否有差异</li>
+<li>Cbx7，RYBP是否有共同或独特的生物学功能</li>
+<li>Cbx7，RYBP在染色质的定位是否是<strong>相互依赖</strong></li>
+</ol>
+<p>得到的部分答案是：小鼠中有两个互斥的PRC1复合体的变异体，Cbx7和RYBP。Cbx7和RYBP的在基因组上的结合在同一个位置，但是同样互斥，不能共存。 Cbx7用于招募Ring1B结合到染色质，RYBP增加PRC1酶活性。 RYBP所结合的基因，有着较低水平Ring1B和H2AK119ub的水平，表达量高于Cbx7结合态。RYBP和Cbx7的在基因位点的结合情况还与代谢调节，细胞周期过程有关。</p>
+<p><strong>ChIP的用途：</strong></p>
+<p>为了解决PRC1亚型的定位问题， 作者对PRC1复合体的组成Cbx7, Ring1B, RYBP, 以及PRC2的Suz12f分别做了ChIP-Seq. 然后就是画了很多韦恩图看不同蛋白的靶基因的相互关系。还看了不同蛋白在基因的上的位置。</p>
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-1895-2013053-5067f5d1f3cf10f0.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183747.png" alt="ChIP-seq基础入门"></a></p>
+<p>一般而言，ChIP-Seq基本就是得到上面这些图，根据疑问再找到某一些基因看调控蛋白的结合和定位。本次实战也就是尝试做出这些图。</p>
+<p>根据原文，ChIP-Seq的流程如下：</p>
+<ul>
+<li>先用<strong>Bowtie</strong>（0.12.7）把RYBP, Cbx7, Ring1B, Suz12,和H2AK11Ub的ChIP-Seq产生短读(reads) 比对到小鼠的参考基因组上（NCBIM37），参数允许seed联配时有2个错配。</li>
+<li>使用MACS（1.4.1）寻找可能的结合位点，也就是基因组中大量短读片段富集的区域。MACS比较这些区域在对照组和实验组的差异，选择p值等于10e-5作为阈值。 之后PDR低于5%的Cbx7, Ring1B, Suz12和H2AK119ub的peak和PDR低于1%的RYBP的peak结合用于进一步分析</li>
+</ul>
+<blockquote>
+<p>这一步看起来就很复杂，之后会重点进行学习</p>
+</blockquote>
+<ul>
+<li>在基因内部或距离TSS 2.5kb的 peak 被认为是靶基因。 每个TSS附近5Kb区域，并且与一个或多个ChIP-Seq(RYBP,Ring1B, Cbx7, Suz12, H2AK119ub)结果关联，用于计算ChIP-Seq表达谱和全ChIP-Seq覆盖度。</li>
+<li>使用BEDtools 计算TSS附近ChIP-Seq表达谱</li>
+</ul>
+<p>ChIP-Seq数据分析的流程难点在于找到peak，所以peak calling这一阶段的软件选择比较重要，目前常用的是MACS2, 实际分析建议多用几个软件。目前常用的是MACS2, 实际分析建议多用几个软件。</p>
+<h2 id="数据下载和质量控制"><a href="#数据下载和质量控制" class="headerlink" title="数据下载和质量控制"></a>数据下载和质量控制</h2><p>这部分下载ChIP-Seq数据，以及小鼠的参考基因组，注释。</p>
+<ul>
+<li>下载测序数据，并用sratoolkit解压缩文章提供的GEO是GSE42466，可以在<a href="https://www.ncbi.nlm.nih.gov/geo/" target="_blank" rel="noopener">https://www.ncbi.nlm.nih.gov/geo/</a> 检索到对应的数据集</li>
+</ul>
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-4261-2013053-1f008758943f16f5.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183757.png" alt="ChIP-seq基础入门"></a></p>
+<p>GEO</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># 我习惯将数据保存到项目文件夹下的data中 mkdir -p GSE42466&#x2F;data&#x2F;chip-seq cd GSE42466&#x2F;data&#x2F;chip-seq for ((i&#x3D;204;i&lt;&#x3D;209;i++)); do   wget -4 -q ftp:&#x2F;&#x2F;ftp-trace.ncbi.nlm.nih.gov&#x2F;sra&#x2F;sra-instant&#x2F;reads&#x2F;ByStudy&#x2F;sra&#x2F;SRP&#x2F;SRP017&#x2F;SRP017311&#x2F;SRR620$i&#x2F;SRR620$i.sra;   ~&#x2F;miniconda&#x2F;envs&#x2F;biostar&#x2F;bin&#x2F;fastq-dump –split-3 SRR620$i.sra; done &amp;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>下载小鼠参考基因组的索引和注释文件, 这里用常用的mm10</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># 索引大小为3.2GB， 不建议自己下载基因组构建 mkdir referece &amp;&amp; cd reference wget -4 -q ftp:&#x2F;&#x2F;ftp.ccb.jhu.edu&#x2F;pub&#x2F;data&#x2F;bowtie2_indexes&#x2F;mm10.zip unzip mm10.zip</span><br></pre></td></tr></table></figure>
+
+<p>注释文件到<a href="https://genome.ucsc.edu/cgi-bin/hgTables" target="_blank" rel="noopener">https://genome.ucsc.edu/cgi-bin/hgTables</a> 选取保存。</p>
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-4057-2013053-d6f72a4f1f69d359.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183750.png" alt="ChIP-seq基础入门"></a></p>
+<p>或者用curl进行下载。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl &#39;https:&#x2F;&#x2F;genome.ucsc.edu&#x2F;cgi-bin&#x2F;hgTables?hgsid&#x3D;603641571_MKLxB78UAcjaI3oj5YiFCA0Ms86o&amp;boolshad.hgta_printCustomTrackHeaders&#x3D;0&amp;hgta_ctName&#x3D;tb_refGene&amp;hgta_ctDesc&#x3D;table+browser+query+on+refGene&amp;hgta_ctVis&#x3D;pack&amp;hgta_ctUrl&#x3D;&amp;fbQual&#x3D;whole&amp;fbUpBases&#x3D;200&amp;fbExonBases&#x3D;0&amp;fbIntronBases&#x3D;0&amp;fbDownBases&#x3D;200&amp;hgta_doGetBed&#x3D;get+BED&#39; &gt; mm10_refSeq.bed</span><br></pre></td></tr></table></figure>
+
+<p>得到的fastq文件，一般而言都是上机得到的原始数据，也有可能是经过质量控制的结果，但是无论如何都得自己去检查一下。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">## 需要安装fastqc 和 multiqc # 先获取QC结果 ls *gz | while read id; do fastqc -t 4 $id; done # multiqc multiqc *fastqc.zip --pdf</span><br></pre></td></tr></table></figure>
+
+<p>根据质控结果，发现序列的前后几个碱基质量不好，因此在比对的时候会主动忽略。</p>
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-1809-2013053-3630d6c9df566fab.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183754.png" alt="ChIP-seq基础入门"></a></p>
+<p>今后，可能会去下载其他实验的数据，还要进行质量控制，所以就写一个Python脚本进行流程化操作。脚本命名为<code>sra2qc.py</code>，保存在我的GitHub上</p>
+<h2 id="序列比对"><a href="#序列比对" class="headerlink" title="序列比对"></a>序列比对</h2><p>这一步非常简单， 就是将得到fastq文件用bowtie2比对小鼠参考基因组上，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bowtie2 -p 6 -3 5 --local -x reference&#x2F;mm10 -U ChIP-Seq&#x2F;SRR620204.fastq | ~&#x2F;miniconda3&#x2F;bin&#x2F;samtools sort -O bam -o ..&#x2F;analysis&#x2F;alignment&#x2F;ring1B.bam bowtie2 -p 6 -3 5 --local -x reference&#x2F;mm10 -U ChIP-Seq&#x2F;SRR620205.fastq | ~&#x2F;miniconda3&#x2F;bin&#x2F;samtools sort -O bam -o ..&#x2F;analysis&#x2F;alignment&#x2F;cbx7.bam bowtie2 -p 6 -3 5 --local -x reference&#x2F;mm10 -U ChIP-Seq&#x2F;SRR620206.fastq | ~&#x2F;miniconda3&#x2F;bin&#x2F;samtools sort -O bam -o ..&#x2F;analysis&#x2F;alignment&#x2F;suz12.bam bowtie2 -p 6 -3 5 --local -x reference&#x2F;mm10 -U ChIP-Seq&#x2F;SRR620207.fastq | ~&#x2F;miniconda3&#x2F;bin&#x2F;samtools sort -O bam -o ..&#x2F;analysis&#x2F;alignment&#x2F;RYBP.bam bowtie2 -p 6 -3 5 --local -x reference&#x2F;mm10 -U ChIP-Seq&#x2F;SRR620208.fastq | ~&#x2F;miniconda3&#x2F;bin&#x2F;samtools sort -O bam -o ..&#x2F;analysis&#x2F;alignment&#x2F;IgGold.bam bowtie2 -p 6 -3 5 --local -x reference&#x2F;mm10 -U ChIP-Seq&#x2F;SRR620209.fastq | ~&#x2F;miniconda3&#x2F;bin&#x2F;samtools sort -O bam -o ..&#x2F;analysis&#x2F;alignment&#x2F;IgG.bam</span><br></pre></td></tr></table></figure>
+
+<p>我对比对结果进行了简单的统计，发现比对率其实不太高. 虽然在RNA-Seq是要求80~90%的比对率，但是在ChIP-Seq上，我没有具体了解过。</p>
+<table>
+<thead>
+<tr>
+<th align="left">样品</th>
+<th align="left">比对到单个区域</th>
+<th align="left">比对到多个区域</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">ring1B</td>
+<td align="left">43.76%</td>
+<td align="left">15.81%</td>
+</tr>
+<tr>
+<td align="left">cbx7</td>
+<td align="left">39.39%</td>
+<td align="left">17.49%</td>
+</tr>
+<tr>
+<td align="left">suz12</td>
+<td align="left">48.88%</td>
+<td align="left">17.17%</td>
+</tr>
+<tr>
+<td align="left">RYBP</td>
+<td align="left">58.76%</td>
+<td align="left">28.12%</td>
+</tr>
+<tr>
+<td align="left">IgGold</td>
+<td align="left">54.54%</td>
+<td align="left">27.21%</td>
+</tr>
+<tr>
+<td align="left">IgG</td>
+<td align="left">57.83%</td>
+<td align="left">25.45%</td>
+</tr>
+</tbody></table>
+<p>比对的结果，可以打开IGV查看，和RNA-Seq最大的区别在于你能看到明显的峰，这就是peak。这类peak在全基因组上特别的多，我们无法用肉眼直接选择，因此就需要借助专门的工具查找。</p>
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-1423-2013053-9d8c55ce9e79892d.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183751.png" alt="ChIP-seq基础入门"></a></p>
+<blockquote>
+<p>一般ChIP-Seq都需要提供一个对照组，也就是图中IgG。很明显的发现其他实验组有峰的区域在对照组中是没有的。而实验组没有峰的区域，对照组也没有，这样子就能提出背景噪声。</p>
+</blockquote>
+<h2 id="peak-calling"><a href="#peak-calling" class="headerlink" title="peak calling"></a>peak calling</h2><p>peak calling要用到MACS, 建议用ananconda安装, 因为可以选择合适的Python环境。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda create -n macs python&#x3D;2 source activate macs pip install MACS2</span><br></pre></td></tr></table></figure>
+
+<p>macs2包含一系列的子命令，其中最主要的就是<code>callpeak</code>， 官方提供了使用实例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">macs2 callpeak -t ChIP.bam -c Control.bam -f BAM -g hs -n test -B -q 0.01</span><br></pre></td></tr></table></figure>
+
+<p>一般而言，我们照葫芦画瓢，按照这个实例替换对应部分就行了，介绍一下各个参数的意义</p>
+<ul>
+<li>-t: 实验组的输出结果</li>
+<li>-c: 对照组的输出结果</li>
+<li>-f: -t和-c提供文件的格式，可以是”ELAND”, “BED”, “ELANDMULTI”, “ELANDEXPORT”, “ELANDMULTIPET” (for pair-end tags), “SAM”, “BAM”, “BOWTIE”, “BAMPE” “BEDPE” 任意一个。如果不提供这项，就是自动检测选择。</li>
+<li>-g: 基因组大小， 默认提供了hs, mm, ce, dm选项， 不在其中的话，比如说拟南芥，就需要自己提供了。</li>
+<li>-n: 输出文件的前缀名</li>
+<li>-B: 会保存更多的信息在bedGraph文件中，如fragment pileup, control lambda, -log10pvalue and -log10qvalue scores</li>
+<li>-q: q值，也就是最小的PDR阈值， 默认是0.05。q值是根据p值利用BH计算，也就是多重试验矫正后的结果。</li>
+<li>-p： 这个是p值，指定p值后MACS2就不会用q值了。</li>
+<li>-m: 和MFOLD有关，而MFOLD和MACS预构建模型有关，默认是5：50，MACS会先寻找100多个peak区构建模型，一般不用改，因为你不懂。</li>
+</ul>
+<blockquote>
+<p>原文写到：MACS estimated the FDR by comparing the peaks obtained from the samples with those from the control samples, using the same p value cutoff (10e-5). 估计就是指文章用了q=0.05或0.01</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">macs2 callpeak -c IgGold.bam -t suz12.bam -q 0.05 -f BAM -g mm -n suz12 2&gt; suz12.macs2.log &amp; macs2 callpeak -c IgGold.bam -t ring1B.bam -q 0.05 -f BAM -g mm -n ring1B 2&gt; ring1B.macs2.log &amp; macs2 callpeak -c IgG.bam -t cbx7.bam -q 0.05 -f BAM -g mm -n cbx7 2&gt; cbx7.macs2.log &amp; macs2 callpeak -c IgG.bam -t RYBP.bam -q 0.01 -f BAM -g mm -n RYBP 2&gt;RYBP.macs2.log &amp;</span><br></pre></td></tr></table></figure>
+
+<p>可以看下找到了多个peak，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wc -l *bed   2384 cbx7_summits.bed   8342 ring1B_summits.bed      0 RYBP_summits.bed   7619 suz12_summits.bed</span><br></pre></td></tr></table></figure>
+
+<p>结果显示RYBP无peak，估计是数据上传错误，我们可以下载作者上传的peak数据。此外ring1B我找了8000多个，但是原文是7000个，或许要修改阈值。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget ftp:&#x2F;&#x2F;ftp.ncbi.nlm.nih.gov&#x2F;geo&#x2F;series&#x2F;GSE42nnn&#x2F;GSE42466&#x2F;suppl&#x2F;GSE42466_Suz12_peaks_10.txt.gz gzip -d GSE42466_Suz12_peaks_10.txt.gz mv GSE42466_RYBP_peaks_5.txt RYBP2_summits.bed</span><br></pre></td></tr></table></figure>
+
+<p>结果文件不只是上述提到的一类，还有如下格式：</p>
+<ul>
+<li>NAME_peaks.xls: 以表格形式存放peak信息，虽然后缀是xls，但其实能用文本编辑器打开，和bed格式类似，但是<strong>以1为基</strong>，而bed文件是<strong>以0为基</strong>.也就是说xls的坐标都要减一才是bed文件的坐标</li>
+<li>NAME_peaks.narrowPeak NAME_peaks.broadPeak 类似。后面4列表示为， integer score for display， fold-change，-log10pvalue，-log10qvalue，relative summit position to peak start。内容和NAME_peaks.xls基本一致，适合用于导入R进行分析。</li>
+<li>NAME_summits.bed：记录每个peak的peak summits，话句话说就是记录极值点的位置。MACS建议用该文件寻找结合位点的motif。</li>
+<li>NAME_model.r，能通过<code>$ Rscript NAME_model.r</code>作图，得到是基于你提供数据的peak模型。</li>
+</ul>
+<p>这一部分的工作主要是学习MACS2软件使用方法和参数的含义，难度不大。目标是找到候选靶基因。</p>
+<h2 id="结果注释和可视化"><a href="#结果注释和可视化" class="headerlink" title="结果注释和可视化"></a>结果注释和可视化</h2><p>当我们得到上一步的输出文件后，下一步就是得到文章的结果。用的是Y叔的ChIPseeker，一个充满故事的R包，搜索一下就能看到Y叔的往事。</p>
+<p>ChIPseeker的功能分为三类:</p>
+<ul>
+<li>注释：提取peak附近最近的基因， 注释peak所在区域</li>
+<li>比较：估计ChIP peak数据集中重叠部分的显著性；整合GEO数据集，以便于将当前结果和已知结果比较</li>
+<li>可视化： peak的覆盖情况；TSS区域结合的peak的平均表达谱和热图；基因组注释；TSS距离；peak和基因的重叠</li>
+</ul>
+<p>完全符合我们的需要，都不需要用到<code>bedtools</code>和<code>deeptools</code>。</p>
+<p>在正式的工作开始之前，我们需要加载<code>ChIPseeker</code>, 基因组注释包和bed数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># biocLite(&quot;ChIPseeker&quot;) # biocLite(&quot;org.Mm.eg.db&quot;) # biocLite(&quot;TxDb.Mmusculus.UCSC.mm10.knownGene&quot;) library(&quot;ChIPseeker&quot;) # 根据自己存放文章具体地址修改，保证导入的数据是BED格式 ring1B &lt;- readPeakFile(&quot;F:&#x2F;Data&#x2F;ChIP&#x2F;ring1B_peaks.narrowPeak&quot;) cbx7 &lt;- readPeakFile(&quot;F:&#x2F;Data&#x2F;ChIP&#x2F;cbx7_peaks.narrowPeak&quot;) RYBP &lt;- readPeakFile(&quot;F:&#x2F;Data&#x2F;ChIP&#x2F;RYBP2_summits.bed&quot;) suz12 &lt;- readPeakFile(&quot;f:&#x2F;Data&#x2F;ChIP&#x2F;suz12_peaks.narrowPeak&quot;)</span><br></pre></td></tr></table></figure>
+
+<p>得到最基本的peak数据后，我们要做以下事情</p>
+<ul>
+<li>大量的韦恩图，描述不同蛋白结合基因的关系</li>
+<li>不同蛋白在染色体结合位点与TSS的距离</li>
+</ul>
+<p>为了完成上面说的两件事情，我们需要注释peak，准备TSS所在位置然后把peak比对到这些区域.</p>
+<p><strong>注：</strong> 原文提供不同蛋白的交集的基因TSS区域，所以要先做注释。</p>
+<p>关于peak注释一定要多说几句：</p>
+<ul>
+<li>启动子区域目前没有明确定义，一般认为基因起始转录位点的上下游区域是启动子区域，文章认为是TSS2.5 kb 以内都是靶基因</li>
+<li>注释有两类，genomic annotation和nearest gene annotation. 前者是研究直接调控对象，后者是做基因表达调控</li>
+<li>还有一类注释就是简单看peak上下游的范围的基因</li>
+</ul>
+<p>根据文章得知需要距离TSS一定距离的注释，以及peak上下5 Kb 的注释</p>
+<blockquote>
+<p>Genes with a peak within the gene body, or within 2.5 kb from the TSS, were considered to be target genes. An area of 5 kb surrounding each TSS that was associated to one or more ChIP-seq (RYBP, Ring1B, Cbx7, Suz12, or H2AK119ub) was used to calculate the ChIP-seq profile and the whole ChIP-seq coverage.</p>
+</blockquote>
+<p><code>ChIPseeker</code>负责注释的就是annotatePeak，提供了3类注释方式，符合文章的要求</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">peaks &lt;- list(ring1B, cbx7, RYBP, suz12)  peakAnnoList &lt;- lapply(peaks, annotatePeak, tssRegion&#x3D;c(-2500,2500), TxDb&#x3D;txdb,                         addFlankGeneInfo&#x3D;TRUE, flankDistance&#x3D;5000)</span><br></pre></td></tr></table></figure>
+
+<p>结果可以用as.GRanges或者as.data.frame查看。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">as.GRanges(peakAnnoList[[1]]) as.data.frame(peakAnnoList[[1]])</span><br></pre></td></tr></table></figure>
+
+<p>得到的结果会在原先的bed文件中增加额外的注释信息，你可以和之前导入的数据进行比较，比如说<code>geneId, transcriptId,distanceToTSS,flank_txIds</code>等。这些都保存后续作图所需要的信息。我们可以先看不同蛋白的靶位点的注释情况，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plotDistToTSS(peakAnnoList)</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-4668-2013053-21ce29be71b4c05d.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183748.png" alt="ChIP-seq基础入门"></a></p>
+<p>image.png</p>
+<p>原文大量的是不同蛋白结合基因的<strong>韦恩图</strong>，我们可以用更有趣的<code>UpSet</code>的点图</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">genes&#x3D; lapply(peakAnnoList, function(i) as.data.frame(i)$geneId) library(UpSetR) upset(fromList(genes))</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-4235-2013053-c770aabdc7377930.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183755.png" alt="ChIP-seq基础入门"></a></p>
+<p>不同蛋白靶基因的集合关系</p>
+<p>UpSet技术适用于多于5个集合表示情况，对于两个蛋白的靶基因的比较，大家更加喜欢韦恩图的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vennplot(genes[1:2])</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381020-8796-2013053-ce80b1a20b242674.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183752.png" alt="ChIP-seq基础入门"></a></p>
+<p>简单的韦恩图</p>
+<p>感觉没有原文那么高大上，主要原因就是没有上色，可以自行搜索找合适的软件作图。关于不同蛋白靶基因的集合关系图基本上就是这样子。</p>
+<p>下面是根据靶基因间的交集，绘制TSS距离图，比如说四个蛋白的重叠基因。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># 准备TSS区域，然后将peak映射到这些区域，得到tagMatrix fourgenes &lt;- intersect(genes[[1]],intersect(genes[[2]],intersect(genes[[3]],genes[[4]]))) target &lt;- select(txdb, keys&#x3D;fourgenes, columns&#x3D;c(&quot;TXID&quot;,&quot;GENEID&quot;), keytype &#x3D; &quot;GENEID&quot;) promoter &lt;- promoters(txdb, upstream &#x3D; 2500, downstream &#x3D; 2500) target_promoter &lt;- promoter[promoter$tx_id %in% target$TXID] tagMatrixList &lt;- lapply(peaks, getTagMatrix, window&#x3D;target_promoter) plotAvgProf(tagMatrixList , xlim &#x3D; c(-3000,2999))</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-1757-2013053-1cd82b9ed2c3e441.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183749.png" alt="ChIP-seq基础入门"></a></p>
+<p>TSS距离图</p>
+<p>感觉和原图有那么一点像，还可以画个热图</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tagHeatmap(tagMatrixList, xlim&#x3D;c(-2999, 3000), color&#x3D;NULL)</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-5159-2013053-a7bd32bd59729fed.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183756.png" alt="ChIP-seq基础入门"></a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/06/10/ChIP-seq%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" data-id="ckb8a0z86000b1lhjcvgw9l3b" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E6%91%98%E6%8A%84/" rel="tag">网络摘抄</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-一文了解ATAC-seq" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/06/10/%E4%B8%80%E6%96%87%E4%BA%86%E8%A7%A3ATAC-seq/" class="article-date">
+  <time datetime="2020-06-09T18:34:13.000Z" itemprop="datePublished">2020-06-10</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/10/%E4%B8%80%E6%96%87%E4%BA%86%E8%A7%A3ATAC-seq/">一文了解ATAC-seq</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Assay for Transposase-Accessible Chromatin with highthroughput sequencing（ATAC-Seq）即利用转座酶探究可接近性染色质高通量测序技术。通俗来说就是利用转座酶来获取开放性染色质，再通过高通量测序及生物信息学分析来挖掘相关基因信息，以此探究生物学相关问题。</p>
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2018/09/1536287182-8102-1-1P60G42G21a.jpg" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183715.jpg" alt="一文了解ATAC-seq"></a></p>
+<p><strong>Q：为什么研究染色质开放区域？</strong></p>
+<p>A：染色质分为常染色质和异染色质，在结构上常染色质折叠压缩程度低，处于伸展状态，DNA复制，基因转录都发生在DNA的致密高级结构变为松散的状态；这部分打开的染色质，就叫开放染色质（open chromatin）。而打开的染色质，就有足够的区域允许一些调控蛋白（比如转录因子和辅因子）过来与之相结合。而染色质的这种特性，就叫做染色质的可接近性（chromatin accessibility）。通过研究细胞特定状态下开放的染色质区域可以在DNA水平上了解其转录调控。</p>
+<p><strong>Q：如何寻找开放的染色质区域？</strong></p>
+<p>A：传统使用的的实验方法主要是有MNase-seq和DNase-seq ，这两种实验方法的主要思路是：染色质变得开放，就意味着DNA和组蛋白的聚集程度降低，就会有一部分DNA暴露出来。而一旦失去了蛋白质的保护，这部分DNA就可以被DNA酶（MNase或DNase I）所切割。然后，我们再把切割完的DNA拿来测序，和已知的全基因组序列相比较，就能发现被切割的是哪些序列，没有被切掉的基因序列又在哪里，就知道开放的染色质区域在哪里了。不过，这两个方法有明显的缺陷，即耗时费力与重复性差。虽然FAIRE-seq 不依赖酶和抗体，但其检测背景较高，测序信噪比低，甲醛交联时间不好把握等缺陷，限制其使用范围。</p>
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2018/09/1536287184-9010-1-1P60G42J4121.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183717.png" alt="一文了解ATAC-seq"></a></p>
+<center> 图1 ATAC-seq原理示意图</center>
+
+<p><strong>Q：有什么新技术方法来研究开放染色质？</strong></p>
+<p>A：新推出的ATAC-seq利用Tn5转座酶（DNA转座，是一种把DNA序列从染色体的一个区域搬运到另外一个区域的现象，这一过程就由转座酶参与完成。Tn5转座酶：“标签片段化工具”，Tn5转座体可将其衔接子负载整合到可接近的染色质区域，而空间位阻较不可接近的染色质使得转座不可能发生。）人为将将携带已知DNA序列标签的转座复合物，加入到细胞核中，再利用已知序列的标签进行PCR建库测序，就知道哪些区域是开放染色质了。ATAC-seq出来的结果，和传统方法出来的结果具有很强的一致性，同时也和ChIP-seq有较高的吻合程度。而相比较而言，ATAC-seq的重复性，比MNase-seq和DNase-seq的更强，操作起来也更加简便，而且只需要很少的细胞/组织量，同时测序信号更加好。目前已经成为研究染色质开放性首选的技术方法。</p>
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2018/09/1536287184-2735-1-1P60G42Q5H1.jpg" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183716.jpg" alt="一文了解ATAC-seq"></a></p>
+<center>图2 不同实验方法获得开放性染色质分析的示意图</center>
+
+
+
+<p><strong>Q：ATAC-seq主要优势是什么？</strong></p>
+<p>A：面对现实需求ATAC-seq有以下四个方面的强大优势：</p>
+<ul>
+<li><p>灵敏性高：低细胞起始量（500-50000个）；</p>
+</li>
+<li><p>操作简单，耗时短；</p>
+</li>
+<li><p>实验重复性好：技术重复间表现出非常好的可重复性( R = 0.98) ，并与DHs 测序数据间也有着较好的一致性(R＞0.79)；</p>
+</li>
+<li><p>能同时揭示开放染色质的基因组位置，DNA结合蛋白，转录结合位点的相互作用</p>
+</li>
+</ul>
+<p>  <a href="https://plobimage.ybzhao.com/wp-content/uploads/2018/09/1536287186-2425-1-1P60G42S2Z4.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183719.png" alt="一文了解ATAC-seq"></a></p>
+  <center>表1 ATAC-seq与传统方法比较</center>
+
+
+
+<p><strong>Q：ATAC-seq能用在那哪些方面？</strong></p>
+<p>A：结合ATAC-seq优势以及研究热潮ATAC-seq有以下用途；当然进一步的开发也可能在不久的将来让其使用更加广泛。</p>
+<ol>
+<li><p>非生物逆境，病虫害，营养，激素等处理前后及动物疾病，转录活性差异。</p>
+</li>
+<li><p>不同组织，器官转录活性差异，找到组织特异基因和启动子。</p>
+</li>
+<li><p>利用ATAC-seq技术来研究A、B、D三个亚基因组的转录因子结合位点的差异，从而研究同源基因的表达调控差异。而六倍体与二倍体、四倍体等位基因间调控位点的比较。</p>
+</li>
+<li><p>通过ATAC-seq定义的open chromatin区域 ，再结合motif 分析，识别哪种转录因子参与了基因表达调控（对于抗体质量不好的TF，尤其有效）</p>
+</li>
+<li><p>而将ATAC-seq和RNA-seq进行整合研究，将会获得对生物体（动物或植物）中的转录调控机制；宏观分析细胞在该特定时空下整个基因组的调控网络。</p>
+</li>
+</ol>
+<p><strong>Q：ATAC-seq 有哪些缺陷呢？</strong></p>
+<p>A：任何技术都有其限制因素，ATAC-seq也不例外；</p>
+<ol>
+<li><p>Tn5通过插入剪断DNA 并将测序接头连接到剪断的两个DNA 片段的末端，因此对于一个DNA 片段而言，其两端的接头连接是随机的，这便导致同一片段两端的接头有50%的概率是同一接头。而只有连接不同接头的片段才可用于富集扩增及测序，因此，有一半的片段无法利用；</p>
+</li>
+<li><p>大量剪断的DNA 由于片段过大，无法进行PCR富集;</p>
+</li>
+<li><p>Tn5 的活性受反应溶液的组成及反应条件影响，仍然需要优化以便提高剪切效果；</p>
+</li>
+<li><p>ATAC-seq在植物细胞中存在以下难点：细胞壁的存在，叶绿体、线粒体等细胞器的污染，缺少稳定遗传的细胞系;</p>
+</li>
+</ol>
+<p><strong>Q：现在用ATAC-seq发表文章多么？</strong> </p>
+<p>A：ATAC-seq在2013年问世，文章数量逐年增加，2018年刚开年就已经有近10篇文章已经发表；把握机会让您的研究如虎添翼。</p>
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2018/09/1536287184-1802-1-1P60G43022109.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183718.png" alt="一文了解ATAC-seq"></a></p>
+<p><strong>Q：ATAC-seq文章推荐</strong></p>
+<p>A：ATAC-seq文章数量不断增长，希望下一篇就是您的杰作。</p>
+<p><u><strong><em>[1] Ackermann, A. M., Wang, Z., Schug, J., Naji, A., &amp; Kaestner, K. H. (2016). Integration of ATAC-seq and RNA-seq identifies human alpha cell and beta cell signature genes. Mol Metab, 5(3), 233-244. doi: 10.1016/j.molmet.2016.01.002</em></strong></u></p>
+<p>从55岁的男性病人中获取了一种新的食管癌细胞系：MFD-1，采用ATAC-seq方法与经典的食道癌细胞系OE33和人食管上皮细胞HET1A比较差异，进行MFD-1癌细胞特性研究，绘制MFD-1染色质开放位点图谱。和正常上皮细胞相比，MFD-1特异的染色质开放位点显著富集着CTCF、NFY、Meis3 、Nrf2 的motif，且这些位点附近基因富集在和上皮癌及消化道肿瘤相关的功能分组内。</p>
+<p>结合全基因组测序（WGS）和表达谱测序（RNA-seq）技术，发现细胞系中4 个基因(ABCB1, DOCK2, SEMA5A 和TP53）存在5个突变位点，提供了MFD-1的基因表达特性。说明MFD-1能作为一种代表性的临床前原发性食管癌模式细胞系，可用于对应突变类型的研究。</p>
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2018/09/1536287188-6245-1-1P60G43044548.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183716.png" alt="一文了解ATAC-seq"></a></p>
+<p><u><strong><em>[2] Tan, L., Ke, Z., Tombline, G., Macoretta, N., Hayes, K., Tian, X. Gorbunova, V. (2017). Naked Mole Rat Cells Have a Stable Epigenome that Resists iPSC Reprogramming. Stem Cell Reports, 9(5), 1721-1734. doi: 10.1016/j.stemcr.2017.10.001</em></strong></u></p>
+<p>成年裸鼹鼠skin fibroblasts (NSF)的iPSC诱导率显著低于小鼠mouse skin fibroblasts (MSF)。筛选了12个能提高重编程效率的因子，发现其中的LT（一种能够抑制Rb基因表达的东西）能提高裸鼹鼠的iPSC诱导效率。</p>
+<p>此研究首先用组蛋白修饰ChIP-qPCR和组蛋白质谱对比了裸鼹鼠和小鼠组蛋白修饰的差异，又用ATAC-seq查看了开放区的差异。ATAC-seq结果跟前面复杂的组蛋白转录后修饰的结果非常符合ATAC-seq分析结果。</p>
+<p>ATAC-seq实验表明：裸鼹鼠中重编程基因的promoter区跟小鼠比起来处于一种都关起来了（more closed）的状态，表达LT之后（LT可以抑制Rb, 提高重编程效率），发现裸鼹鼠这些基因的promoter区又大量开放了（massive opening）。</p>
+<p>结论：裸鼹鼠具有更加稳定的表观基因组，这一特征帮助它抵抗脱分化，从而为抗癌和长寿做出了贡献。<a href="https://plobimage.ybzhao.com/wp-content/uploads/2018/09/1536287188-7753-1-1P60G43059D8.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2019-12-20-214437.png" alt="一文了解ATAC-seq"></a></p>
+<p><strong>Q：ATAC-seq送样标准？</strong></p>
+<p>A：ATAC-seq因其限制性因素较少样品准备也变得简单，以下是其送样标准：</p>
+<table>
+<thead>
+<tr>
+<th><strong>样品类型</strong></th>
+<th align="center">样品量</th>
+<th>样品处理</th>
+<th>运输方式</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>细胞系</strong></td>
+<td align="center">＞5×104个</td>
+<td>取样后直接速冻</td>
+<td>干冰寄送（3d内）</td>
+<td>细胞是完整的且为均匀的单细胞悬液；</td>
+</tr>
+<tr>
+<td><strong>动物组织</strong></td>
+<td align="center">≥1g</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>植物组织</strong></td>
+<td align="center">≥1g</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>真核微生物</strong></td>
+<td align="center">需和老师协商</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<ol>
+<li>样本要求</li>
+</ol>
+<p>1)新鲜细胞</p>
+<p>细胞培养于培养瓶中，在运输前灌满培养基，室温运输。</p>
+<p>具体要求为：细胞数量&gt;20 万，细胞状态良好无污染。</p>
+<p>2)冻存细胞</p>
+<p>培养细胞进行计数，按照5*104个细胞每管进行分装，分装好的细胞 4℃、500 G 离心 5 min；PBS洗涤，4℃、500G离心5min。小心吸去全部液体，将细胞沉淀用液氮进行速冻，干冰运输。</p>
+<p>具体要求:细胞严格按照 5*104每管分装，每个样品分装三管。</p>
+<p>3)动物组织</p>
+<p>新鲜的组织取到1.5ml EP管中，用液氮进行速冻，干冰运输。 动物组织质量应当&gt;1g，并且组织新鲜无降解，无结缔组织或血块存在。</p>
+<p>4)植物组织</p>
+<p>选取新鲜的植物组织，用液氮进行速冻，干冰运输。 尽量选取新鲜的嫩叶或者花等作为实验样品，样品量尽可能多;样品应保证新鲜。</p>
+<ol start="2">
+<li>样品包装</li>
+</ol>
+<p>所有的容器应当用parafilm进行封口</p>
+<p>注意：</p>
+<p>生物学重复：2-4次</p>
+<p>测序深度：100 M以上，保证50 M 有效reads</p>
+<p>样本要求：ATAC-seq实验对于细胞数量和质量有着严格的要求，实验的成败很大程度上细胞的状态以及细胞量与Tn5转座酶的比例。若细胞状态差，污染严重，那么测序的结果会出现很大的偏差。若果细胞数量过少，过多的酶会进行过度的切割，导致测序结果异常；而细胞量过多可能导致切割不充分，使得原本应当测到的开放区域未被测出。</p>
+<p><strong>Q：ATAC-seq-数据交付及周期</strong></p>
+<p>A：ATAC-seq数据质控标准：</p>
+<p>①采用PE50测序策略数据量满足要求clean data≥50M clean reads（特别注意研究转录因子测序数据量需要≥200M）；</p>
+<p>②Q20 ≥ 80% ;</p>
+<p>交付周期：45个工作日（样本数≤20个）；大项目周期需评估沟通。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/06/10/%E4%B8%80%E6%96%87%E4%BA%86%E8%A7%A3ATAC-seq/" data-id="ckb8a0z8c000j1lhj704zbtbf" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E6%91%98%E6%8A%84/" rel="tag">网络摘抄</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Chip-seq与ATAC-seq的异同" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/06/10/Chip-seq%E4%B8%8EATAC-seq%E7%9A%84%E5%BC%82%E5%90%8C/" class="article-date">
+  <time datetime="2020-06-09T18:34:03.000Z" itemprop="datePublished">2020-06-10</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/10/Chip-seq%E4%B8%8EATAC-seq%E7%9A%84%E5%BC%82%E5%90%8C/">Chip-seq与ATAC-seq的异同</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近有人问我关于ATAC-Seq与ChIP-Seq的区别。刚好在分析ATAC-Seq和DNase-Seq的数据，于是做了个简单介绍。在<a href="https://www.jianshu.com/u/d5b900bea027" target="_blank" rel="noopener">六六_ryx</a>的博客里面看到下面的介绍，做了简单修改放在这里跟大家分享。</p>
+<p>ATAC-Seq、DNase-Seq与ChIP-Seq的不同的是：</p>
+<p>ATAC-Seq和DNase-Seq是用来鉴定全基因组范围内染色质的开放区域（open chromatin region），可以得到全基因组范围内的蛋白质可能结合区域信息，一般用于不知道特定的转录因子，用此方法与其他方法结合筛查感兴趣的特定调控因子。</p>
+<p>ChIP-Seq是明确知道感兴趣的转录因子是什么，根据感兴趣的转录因子的抗体去富集转录因子结合的DNA区域。同时，该方法也用于鉴定组蛋白结合位置和组蛋白修饰的区域，例如：H3K4me3，H3K27ac等。</p>
+<p>除了这三种实验方法外，还有其他多种鉴定染色体元件的实验方法。这些方法基本整体思路比较类型，都是对特定区域进行富集，然后根据不同实验原理开展不同的后续分析。下面是下面的这张图是从《<a href="https://www.nature.com/articles/nrg3788#f1" target="_blank" rel="noopener">Identifying and mitigating bias in next-generation sequencing methods for chromatin biology</a>》这篇文章中截取的ATAC-Seq、ChIP-Seq、Dnase-Seq、MNase-Seq、FAIRE-Seq进行简单比较，希望对大家有所帮助。</p>
+<p><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183649.jpg" alt="各种染色体元件鉴定方法比较"></p>
+<center>An overview of ChIP–seq, DNase-seq, ATAC-seq, MNase-seq and FAIRE–seq experiments</center>
+
+
+
+<p>以上方法可以简单概括为：</p>
+<ul>
+<li><strong>ChIP-Seq</strong>是揭示特定转录因子或蛋白复合物的结合区域，实际是研究DNA和蛋白质的相互作用，利用抗体将蛋白质和DNA一起富集，并对富集到的DNA进行测序。</li>
+<li><strong>DNase-Seq、ATAC-Seq、FAIRE-Seq</strong>都是用来研究开放染色质区域。DNase-Seq是用的DNase I内切酶识别开放染色质区域，而ATAC-seq是用的Tn5转座酶，随后进行富集和扩增；FAIRE-Seq是先进行超声裂解，然后用酚-氯仿富集。</li>
+<li><strong>MNase-Seq</strong>是用来鉴定核小体区域。</li>
+</ul>
+<p>参考：</p>
+<p><a href="https://www.jianshu.com/p/87bc2002e82c" target="_blank" rel="noopener">https://www.jianshu.com/p/87bc2002e82c</a></p>
+<p>[<a href="https://bioinformatics-core-shared-training.github.io/cruk-autumn-school-2017/ChIP/Materials/Lectures/Lecture4_Introduction%20to%20ChIP-seq%20and%20ATAC-seq_SS.pdf]" target="_blank" rel="noopener">https://bioinformatics-core-shared-training.github.io/cruk-autumn-school-2017/ChIP/Materials/Lectures/Lecture4_Introduction%20to%20ChIP-seq%20and%20ATAC-seq_SS.pdf]</a>(</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/06/10/Chip-seq%E4%B8%8EATAC-seq%E7%9A%84%E5%BC%82%E5%90%8C/" data-id="ckb8a0z8200031lhjawu2dd7c" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E6%91%98%E6%8A%84/" rel="tag">网络摘抄</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-泛素样蛋白的来源及功能" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/06/10/%E6%B3%9B%E7%B4%A0%E6%A0%B7%E8%9B%8B%E7%99%BD%E7%9A%84%E6%9D%A5%E6%BA%90%E5%8F%8A%E5%8A%9F%E8%83%BD/" class="article-date">
+  <time datetime="2020-06-09T18:26:20.000Z" itemprop="datePublished">2020-06-10</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/10/%E6%B3%9B%E7%B4%A0%E6%A0%B7%E8%9B%8B%E7%99%BD%E7%9A%84%E6%9D%A5%E6%BA%90%E5%8F%8A%E5%8A%9F%E8%83%BD/">泛素样蛋白的来源及功能</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="一、泛素样蛋白的来源及功能"><a href="#一、泛素样蛋白的来源及功能" class="headerlink" title="一、泛素样蛋白的来源及功能"></a>一、泛素样蛋白的来源及功能</h1><p><strong>真核生物蛋白可以通过与各种小分子物质或蛋白质相结合的方式被修饰。在众多的修饰方式当中有一种就是与泛素蛋白或泛素样蛋白（UBL）相结合，采用这种修饰方法可以对多种生理过程进行调控。UBL蛋白可以控制被修饰蛋白与其它生物大分子（比如蛋白酶体或染色质）间的相互作用。各种UBL系统都会使用相应的酶来催化修饰反应，不过这些修饰反应中大部分都是暂时的。有越来越多的证据表明这种UBL修饰途径来自原核生物的硫转移酶系统（sulphurtransferase system）及相关酶类。而且，在真核生物的共同祖先中，类似于UBL连接酶和UBL去连接酶的蛋白也是广泛存在的，这些证据都说明UBL修饰系统不是起源于真核生物。</strong></p>
+<p>真核细胞内的蛋白都会经历各种翻译后修饰，这些修饰过程极大地扩展了蛋白的功能多样性和动力学多样性。蛋白可以通过与磷酸基团、甲基化基团、乙酰基团或某些蛋白质基团（通常这种连接方式都是短暂的）相连接的方式被修饰。而泛素蛋白修饰方式就是上述与蛋白质相连的修饰方式中第一个被发现的。现在，我们已经对这种修饰途径研究得非常透彻了。泛素蛋白是一小分子蛋白，它在真核生物界非常保守，但是在真细菌界（Eubacteria）和古细菌界（Archaea）都不存在。泛素蛋白还可以与上千种不同的蛋白结合。</p>
+<p>泛素化过程是一个复杂的过程（背景知识框1）。UBL修饰途径也与泛素化修饰途径类似。参与UBL修饰途径的酶虽然各不相同，但在进化上都与参与泛素化途径的酶具有相关性。由于泛素蛋白与UBL蛋白具有相同的三维核心结构——β-抓握折叠（β-grasp fold）结构——这说明各种不同的UBL修饰系统都源自一个共同的祖先。</p>
+<p><strong>背景知识框1：泛素蛋白连接机制</strong></p>
+<p><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-182723.jpg" alt="1"></p>
+<p><strong>泛素蛋白（图中绿色圆圈所示）是由76个氨基酸残基组成的多肽，它可以被一系列的酶促反应活化，进而与底物靶蛋白相连接（如图中箭头所示）。UBL修饰系统采用的也是类似途径。<br>有三种酶——E1、E2和E3——参与了泛素修饰反应，这包括多泛素蛋白合成反应，即在一个泛素蛋白的基础之上再添加好几个泛素蛋白（如图中括号所示）。E1酶负责活化泛素蛋白、E2酶通过转硫醇作用从E1酶处获得泛素蛋白，并将其与底物蛋白相结合，然后E3酶将泛素蛋白与底物连接（在某些情况下会先形成一种硫酯中间产物，然后再与底物结合）。所有真核生物编码的E2和E3同工酶种类非常多，其中E2同工酶有几十种，而E3同工酶则多达数百种。这样，细胞就能对多种蛋白进行各种方式、特异性的修饰和调节，而且这些修饰调控作用也都会受到严密的时空调控。<br>泛素蛋白的C末端通常都经由酰胺键（amide linkage）与靶蛋白的氨基团连接在一起。最常见的连接是与靶蛋白赖氨酸的ε氨基团相连，不过也可以与靶蛋白的N末端相连。此外，最近还发现泛素蛋白可以与靶蛋白上的半胱氨酸、丝氨酸和苏氨酸相连。在多泛素链中，一个泛素蛋白分子的赖氨酸侧链与另一个泛素蛋白的C末端相连，如此反复形成多泛素链。泛素蛋白含有7个赖氨酸残基，所有这些赖氨酸残基都可以参与上述多泛素链的合成过程。<br>泛素蛋白的C末端含有甘氨酸残基，在泛素蛋白与其它蛋白相连之前，该残基必须被活化。最初，C末端被E1酶腺苷酰化，随后E1酶的半胱氨酸侧链攻击泛素蛋白的C末端，形成E1-泛素蛋白硫酯中间产物。然后被活化的泛素蛋白被“移交”给E2酶活性位点中的半胱氨酸残基，再在E3酶的共同作用下，催化靶蛋白泛素化反应。E3酶在识别靶蛋白底物的过程中起到了关键性作用（不过有些UBL途径不需要E3酶的参与）。在泛素化修饰途径中，还有一些不同的E3酶可以催化泛素蛋白与被单泛素化修饰或多泛素化修饰的靶蛋白相连接。这些E3酶有时也被称为E4酶（尤其是在延伸多泛素侧链时）。去泛素化酶（DUB）可以将靶蛋白上的泛素蛋白水解下来，由于DUB酶的存在，泛素化作用只能是暂时的。<br>这种由泛素蛋白和其它UBL蛋白负责的动态修饰过程构成了一个可逆的“开关”，来控制底物蛋白的不同功能状态，调控细胞内的多种生理活动过程。</strong></p>
+<p>泛素蛋白于1975年被首次发现。之后的10年间，我们对泛素修饰系统的进化前体分子（evolutionary precursors）进行了深入的研究。泛素蛋白被认为是真核生物蛋白中最保守的蛋白之一，但直到最近都还没有很好的、足够灵敏的序列比对方法在细菌蛋白质中发现序列相似的蛋白质。不过，近两年技术方法的快速发展彻底改变了这种情况。首先，序列比对方法变得更为先进了，因而发现了许多泛素蛋白以及泛素修饰系统参与蛋白之间的相似之处，也发现了很多细菌蛋白之间的相似之处；其次，结构测定研究发现，在很多原核蛋白、真核蛋白中都有泛素样折叠结构，不过这些蛋白之间在序列上的相似性很低；第三，在对次级代谢产物和酶辅因子，比如原核生物里的硫胺素（thiamine），即维生素B1等的机理分析中发现了UBL蛋白的激活与连接机制。</p>
+<p>这些研究进展说明，泛素系统是由各种早就在原核生物里存在的、经历了多样化改变的组成元件和反应体系进化而来的。</p>
+<p>在泛素修饰过程中存在的多样性非常奇特，修饰的结果取决于泛素蛋白是以单体形式还是多聚体形式与靶蛋白相连接（图1）。各种不同的泛素蛋白间的连接形式决定了被修饰蛋白的命运。当靶蛋白被多泛素化途径修饰之后会与26S蛋白酶体这种多亚基蛋白酶复合物结合，然后被降解，靶蛋白降解后泛素蛋白会被循环利用。细胞利用这种途径降解那些“多余的”蛋白质，以保证细胞周期的正常进行，保证转录调节、蛋白质含量、信号转导甚至昼夜节律等的正确性。泛素化修饰也有非降解作用，比如介导膜蛋白内吞作用和蛋白质胞内运输作用、参与染色质介导的转录调节作用、DNA修复作用以及信号复合体合成等等。泛素化途径与细胞内这么多的功能都有关系，这就不难解释为什么我们会发现越来越多的疾病都与泛素化途径失调有关了。这些疾病包括癌症、Angelman综合征等严重智力障碍疾病，帕金森氏病、阿尔茨海默病和亨廷顿氏病等神经变性性疾病以及II型糖尿病等等。</p>
+<p><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-182726.jpg" alt="2"></p>
+<p><strong>1. 泛素样蛋白及其相关蛋白结构域</strong><br>对UBL蛋白及其相关蛋白结构域的研究缘起于上世纪80年代末。当时发现了一种干扰素诱导的、分子量为15KDa的蛋白产物——ISG15。该蛋白在序列上与泛素蛋白有高度的相似性——可以通过共价结合的方式修饰其它蛋白。后来发现ISG15蛋白是表1中所列举的一系列UBL蛋白中第一个被发现的UBL蛋白。尽管如此，直到目前为止我们对它的功能还是知之甚少，至今才发现了ISG15蛋白的E1酶（即ISG15活化酶）和E2酶（即ISG15连接酶）（背景知识框1）。这些酶与ISG15蛋白一样，也都是被I型干扰素诱导表达的。我们用小鼠模型研究发现，蛋白经ISG15蛋白修饰之后，可以表现出抗病毒作用，这也符合ISG15蛋白通过I型干扰素诱导表达的特性。I型干扰素是机体先天免疫系统对病毒作出反应而产生的活性蛋白。</p>
+<p>与泛素蛋白一样，9种UBL蛋白都是通过共价连接的方式连接到靶生物大分子（大部分是蛋白）上从而对其进行修饰的。表1列出了UBL修饰系统常见的靶蛋白（不过该表并不完整）。泛素系统可以对酵母细胞中超过1000多种的不同蛋白质进行修饰，有一些UBL修饰途径，比如SUMO（小类泛素修饰因子）修饰途径的靶蛋白非常多，而且靶蛋白之间差异非常大。而另一些UBL修饰途径的靶蛋白范围则非常有限，比如UBL蛋白酵母蛋白Atg12似乎只有一个靶蛋白Atg5，Atg8蛋白只与一种特殊的磷脂——磷脂酰乙醇胺（phosphatidylethanolamine）相结合。</p>
+<p><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-182724.jpg" alt="3-1"></p>
+<p><strong>本表中列举的UBL蛋白都来自酿酒酵母（如果酿酒酵母中有这些蛋白）和脊椎动物（如果酿酒酵母中没有这些蛋白）。如果在酿酒酵母中和脊椎动物中皆存在，则在酿酒酵母UBL蛋白后的括号中显示脊椎动物UBL蛋白。对于E1酶和E2酶，如果酿酒酵母中有这些蛋白则显示酿酒酵母中酶。UBA6蛋白要比Uba1蛋白的种系分布范围窄的多。<br>ND：经由标准的BLAST程序没能发现相似性；NI：没有发现；†表示两个结构域各自的相似度。</strong></p>
+<p>正如前面提及的那样，大部分的UBL修饰途径使用的酶都是类似的。UBL蛋白连接的主要途径似乎源自一个古老的生物合成途径（我们将会在下文中对该途径进行介绍）。该途径中的酶和蛋白质修饰因子经过了好几轮扩增和多样化改变才变成了今天丰富多彩的UBL修饰途径。不过在几条特殊的UBL修饰途径中还是存在几种例外的UBL连接机制。比如有一种泛素蛋白水解酶，它不仅能够将泛素蛋白从底物蛋白上裂解下来，也能起到完全相反的作用，将泛素蛋白连接到靶蛋白上。还有一些UBL连接酶来自纤毛虫（ciliates）。我们通过序列分析在纤毛虫中发现了一类具有自我剪接功能的多聚蛋白，它们形成了一系列种类各不相同的UBL结构域以及具有自我剪接功能的细菌内蛋白样（BIL）结构域。这些多聚蛋白的编码基因可能起源于一个编码多聚蛋白的基因，然后在进化过程中又获得了编码BIL结构域的基因。</p>
+<p>BIL结构域的N末端具有一个丝氨酸或半胱氨酸残基，这些氨基酸残基可以激活肽键重排机制（peptide-bond rearrangement），通过该机制将BIL结构域上游末端氨基酸肽酰基链（peptide acyl chain）的N转变成O（在N末端是丝氨酸时）或转变成S（在N末端是半胱氨酸时）。这种重排机制起始于裂解和自我间接反应。在BIL-泛素蛋白样蛋白（BUBL）中的BIL结构域内开始N→S酰基转换，该转换过程可能促进了自身催化进程中对底物硫酯（thioester）的亲核攻击（nucleophilic attack）作用，从而将上游UBL蛋白连接到被修饰靶分子上。如果攻击基团是靶蛋白质的赖氨酸侧链，就会得到按照背景知识框1中介绍的那种标准方式进行连接的修饰产物，不过反应过程中没有E1、E2或ATP的参与。值得注意的是，在BUBL前体蛋白BIL结构域上游的序列不是UBL蛋白必需的。因此，可能会有很多蛋白修饰因子，它们并不与泛素蛋白相关，但是可能在结构域的上游起到与BIL结构域相类似的作用。</p>
+<p>还有很多其它相关的泛素蛋白，这些蛋白中的泛素样结构域（ubiquitin-like domain, ULD）属于多肽的一部分，但通常它们既不参与任何反应，也不会与靶蛋白发生共价结合。这种ULD结构域赋予所属蛋白（与可转移UBL类似的蛋白）与某些特殊靶蛋白相结合的能力。有一些ULD结构域可以在特定条件下从所属蛋白中被裂解下来，裂解之后甚至还可以与其它蛋白相连接。比如在细胞经历紫外线伤害后发生的去泛素化酶（deubiquitylating enzyme）USP1内部ULD结构域的自我裂解作用（autocleavage）。这种裂解作用发生后酶就会被灭活，导致细胞内单泛素化修饰的PCNA蛋白大量积聚，而这些PCNA蛋白正是细胞进行DNA修复所需要的。</p>
+<p>在所有UBL蛋白和ULD结构域中广泛存在的β-grasp fold结构非常古老，可见于各个种系生物，它可能来自某个早期蛋白质翻译系统里的RNA结合结构。该β-grasp fold结构参与了多种细胞功能，从为各种酶活性，比如铁硫簇结合活性（iron–sulphur-cluster binding）搭起骨架结构到蛋白质间的相互作用无所不包。</p>
+<p>**2. 泛素样蛋白连接后的结果</p>
+<p>**早期对泛素蛋白开展的研究工作将注意力都放在了泛素蛋白在蛋白质水解过程中的作用上了。26S蛋白酶体负责将被泛素蛋白修饰的靶蛋白水解。多泛素蛋白侧链与蛋白酶体之间的直接结合可能是多泛素修饰靶蛋白与蛋白酶体复合物结合的机制。即多泛素蛋白侧链为靶蛋白提供了一个亲和标签，使其能够与蛋白酶体紧密结合（图2）。在蛋白酶体中具有多种多泛素蛋白侧链受体，此外还在移动穿梭因子（mobile shuttling factor）这种介导多泛素化修饰靶蛋白与蛋白酶体相结合的因子中发现了多泛素蛋白结合结构域（polyubiquitin-binding domain）。</p>
+<p> <img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-182724.jpg" alt="4"></p>
+<p>在泛素蛋白与泛素蛋白结合结构域（UBD）之间发生的特异性相互作用不仅仅限于泛素化修饰蛋白与蛋白酶体之间的结合作用。我们在近十年的研究发现，泛素蛋白和UBL蛋白有很多功能都是通过UBD结构域介导的。比如Vps23/TSG101膜蛋白分类因子中的UBD结构域能介导细胞对单泛素化蛋白修饰膜蛋白的识别，而去泛素化酶Ubp14/USP5蛋白中的UBD结构域则能够帮助Ubp14/USP5蛋白特异性识别尚未结合的多泛素蛋白侧链。到目前为止，我们至少发现了16种UBD结构域，这些结构域之间在三级结构和多肽大小（从30个氨基酸残基至150个氨基酸残基不等）之间都各不相同。这些不同的UBD结构域让真核生物能够借助泛素蛋白系统完成多种功能。</p>
+<p>UBD结构域与泛素蛋白之间的亲和力通常都比较弱，不过虽然如此，但突变研究还是发现了它们之间的相互作用。将多个泛素蛋白连接到一起可以明显增强它们与UBD结构域之间的亲和力，或者与靶蛋白之间的亲和力。其中最突出的例子就是多泛素蛋白与蛋白酶体之间的结合。Cecile Pickart等人研究了各种长度泛素蛋白对试验底物降解作用的不同抑制程度。结果发现四聚体泛素蛋白的抑制作用最强，三聚体的抑制很弱，而二聚体泛素蛋白则完全检测不到抑制作用。这说明四聚体泛素蛋白形成了一个在泛素蛋白单体或低聚体中都不存在的结合决定簇（binding determinant）。</p>
+<p>在UBL修饰途径中研究得最充分的莫过于SUMO途径了。我们通过对SUMO途径中各个酶之间的相互作用以及它们与其它蛋白质间相互作用的研究又发现了很多有关泛素蛋白与靶蛋白间相互作用的详细机制。而且我们还利用遗传、生化以及生物物理学等多个学科的研究最终发现了一个非共价结合的SUMO结合单位——SUMO相互作用基序（SUMO-interaction motif, SIM）。SIM基序是一个由9个氨基酸残基组成的多肽（这要比与泛素蛋白结合的结构域小得多），它的解离常数介于5 μM至10 μM之间，这也就是说它的亲和力要比常见的UBD高很多。在SIM基序中间是由3个或4个疏水氨基酸残基组成的结构，该结构的一侧通常是一组酸性氨基酸残基。SIM基序在SUMO分子疏表面的β2折叠与α1螺旋之间形成β折叠结构，同时SIM基序末端的酸性氨基酸残基也能与SUMO分子表面的碱性氨基酸残基之间发生相互作用。这种结构与被大部分UBD结构域识别的泛素蛋白中的β-grasp fold结构完全不同。在β-grasp fold结构中被识别的区域是泛素蛋白第44位异亮氨酸为中心的一块疏水区域。因此，不同的UBL蛋白都可以作为接头分子来发挥相似的功能，但它们与靶蛋白相连接的机制却可以各不相同。</p>
+<p>很明显，UBL蛋白与靶蛋白之间的连接通常都会促进靶蛋白与其它蛋白之间发生相互作用。这种泛素化修饰是通过直接参与形成蛋白复合物来发挥作用的（图3a）。蛋白间相互作用也可以通过UBL导致的靶蛋白结合位点构象改变来实现（图3b）。大部分已知的UBL调节途径都属于前面所述的图3a类别，只有极少数属于图3b类型。即使只有一小部分细胞蛋白经UBL蛋白修饰，它们的活性也足以影响细胞的生理功能。正如前文所述，这种非共价结合的UBL蛋白与靶蛋白之间的相互作用比较弱。不过可以通过多聚泛素蛋白或者UBL蛋白的方式，又或者泛素蛋白或UBL蛋白与靶蛋白上的多个位点相结合的方式（如图3a、c所示）来增强它们之间的结合力。经SUMO分子修饰的RanGAP1蛋白与核膜孔复合物（nuclear-pore complex）之间的连接就是通过这种多价结合的方式完成的。单独的SUMO分子或RanGAP1蛋白都无法与核膜孔复合物形成紧密连接。</p>
+<p>UBL蛋白发挥作用的另一条途径借助了空间位阻（steric hindrance）机制。靶蛋白上的UBL蛋白可以阻碍靶蛋白与某些蛋白质间相互结合（图3d）。不过目前这种蛋白间阻碍作用的例子还比较少。其中的原因可能是UBL蛋白要能很好地发挥空间位阻效应，需要对细胞内的大多数蛋白都经过修饰才能表现出来。但对于很多蛋白质来说，只有很少一部分得到了修饰。从原理上来说，只要UBL修饰蛋白还连接在靶蛋白上或者改变了靶蛋白的构象，那么这种空间位阻效应就还应该存在。</p>
+<p><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-182722.jpg" alt="5"></p>
+<p>**3. 泛素样蛋白修饰途径的起源</p>
+<p>**我们最早获悉的有关UBL连接酶起源的信息来自酵母泛素蛋白活化酶E1的氨基酸序列。研究发现E1蛋白与MoeB这种负责合成钼辅因子（Moco）的大肠杆菌蛋白具有少许序列相似性。但是在1991年，E1蛋白的序列刚刚被弄清楚时，我们还不知道MoeB蛋白的生化功能。直到上世纪90年代末，我们才逐渐了解这种钼辅因子合成酶以及硫胺素合成酶的氨基酸序列和生化功能信息。令人吃惊的是，该途径与泛素蛋白活化途径具有相似之处。这是由于硫胺素合成途径几乎存在于所有的细菌当中，而钼辅因子合成途径也存在于大部分的细菌当中，我们认为这些酶系统在进化等级上要比泛素蛋白连接酶高出很多。</p>
+<p>**3.1 UBL相关硫载体蛋白</p>
+<p>**要合成钼辅因子和硫胺素分子，就必须在它们的前体物质中加入硫元素，这就需要一种小分子硫载体蛋白的帮助。在钼辅因子合成途径中发挥作用的是MoaD蛋白，而在硫胺素合成途径中发挥作用的却是ThiS蛋白。如图4所示，硫元素是从这些硫载体蛋白C末端的硫代羧酸基团（thiocarboxylate group）上释放出来的。MoaD蛋白和ThiS蛋白都与泛素蛋白一样，在序列的C末端携带一对甘氨酸残基。这些蛋白的C末端在E1样酶（在MoaD蛋白途径中发挥作用的是MoeB蛋白；在ThiS蛋白途径中发挥作用的是ThiF蛋白）的腺苷酰化作用之后，就可以将这些蛋白C末端的甘氨酸羧酸基团转变成硫代羧酸基团。与泛素蛋白一样，MoaD蛋白和ThiS蛋白也都有一个β-grasp fold结构，不过这两种蛋白在氨基酸序列上与泛素蛋白的相似性都不高。因此，泛素蛋白、MoaD蛋白和ThiS蛋白都只是结构相似，它们的C末端都可以经E1样酶的腺苷酰化作用而被激活。早在2000年左右，我们就根据新发现的泛素蛋白相关修饰因子1（ubiquitin-related modifier 1, Urm1）的相关信息，对硫输送系统（sulphur-transfer system）与UBL活化系统之间的进化学亲缘关系进行了深入研究。Urm1蛋白最初是在酿酒酵母（Saccharomyces cerevisiae）中被发现的，它与MoaD蛋白和ThiS蛋白有关（图4右侧部分）。虽然酿酒酵母缺乏与钼相关的酶系统，而且它还采用了一种与细菌完全不同的途径来合成硫胺素，但它还是表达了E1样酶——Uba4蛋白。该蛋白在序列上与ThiF蛋白和MoeB蛋白具有相似性。Uba4蛋白能与Urm1蛋白相结合，促使Urm1蛋白与其它细胞蛋白发生共价结合。这些研究成果表明Urm1蛋白与Uba4蛋白可能都是UBL蛋白连接系统的一部分（如果从序列相似程度考虑，它们与细菌的硫输送系统会更为相近）。不过正如我们下面将要讨论到的那样，Uba4蛋白也在硫输送系统中发挥了作用，因此，它可能是一种双功酶。鉴于此，Urm1-Uba4系统有可能是一种“分子化石”，它保留了远古硫输送系统的特征，同时又具有UBL连接酶的活性。</p>
+<p>**3.2 另一种可能的双功酶——Urm1蛋白</p>
+<p>**E1样酶在ATP的帮助下活化UBL蛋白C末端的过程与其它腺苷酰化作用过程，比如氨酰tRNA连接酶（aminoacyl-tRNA synthetases）活化氨基酸的过程非常类似。对UBL蛋白来说，ATP水解提供的能量被转移到E1-UBL硫酯键（thioester linkage）中去了。不过在被化学活化之后，表1中所列举的所有已知的UBL蛋白（除了Urm1蛋白之外）同时也都会继续发生酯基转移作用（transesterification），将能量再转移到E2酶的硫酯键上。唯一例外的是，Urm1蛋白途径没有使用E1-E2酶系统，而是使用了细菌硫输送系统。Uba4蛋白（即Urm1蛋白途径中的E1酶）含有一个硫氰酸生成酶同源结构域（rhodanese-homology domain，RHD）。这一点与其它UBL系统中的E1酶不同（图4）。硫氰酸生成酶和其它几个含有RHD结构域的蛋白都是硫转移酶，它们通过S-S-H中间体的形式将其活性半胱氨酸位点上的硫转移到靶蛋白上。很多MoeB家族蛋白都含有与Uba4蛋白类似的结构，即有一个E1样结构域及与之相应的C末端，还有一个RHD结构域。根据上述以及其它研究结果，我们认为在MoaD蛋白形成的硫代羧酸产物会在MoeB蛋白相关酶（MoeB-related enzyme）的RHD结构域作用下继续形成酰基二硫化物中间体（acyl disulphide intermediate）。由此类推，Urm1-Uba4系统也会用到Uba4蛋白的RHD结构域。Uba4蛋白的RHD结构域会与Urm1蛋白形成暂时的硫酯中间产物，然后再将硫酯键转移至底物，因此在反应过程中并不需要E2酶的参与（图4）。在酿酒酵母中，该Urm1蛋白与靶蛋白的连接过程需要RHD结构域中的半胱氨酸残基参与。</p>
+<p> <img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-182725.jpg" alt="6"></p>
+<p>2008年，Jennifer Schmitz等人开展的一项工作发现，Uba4蛋白的RHD结构域也能形成过硫化物，并在体外反应中将其末端的硫转移至Urm1蛋白的C末端，形成Urm1蛋白硫代羧酸产物。E1结构域中的半胱氨酸残基并不是该反应所必需的，Jennifer Schmitz等人也没有发现Urm1-Uba4硫酯产物。Jennifer Schmitz等人认为，经腺苷酰化作用的Urm1蛋白受到RHD结构域中过硫化物的攻击，会形成酰基二硫化物中间产物，然后再释放出硫代羧酸产物。他们认为这就是Urm1蛋白与靶蛋白连接的作用机制。</p>
+<p>最近我们还发现了Urm1蛋白途径的一种新功能，即在某些反义tRNA分子的摆动尿嘧啶（wobble uridine）2号位的O被替换成了S。该途径能控制译码的特异性。Urm1蛋白参与了该反应，可能起到了硫转运的功能。tRNA分子被Urm1途径修饰的程度是否决定了Urm1途径的功能还需要我们进一步研究。Urm1蛋白对靶蛋白的修饰作用也能够让tRNA分子被硫醇化，可能的途径是通过形成能够释放出Urm1硫代羧酸产物的Urm1-Uba4酰基二硫化物，然后将硫转移到tRNA。</p>
+<p>虽然Uba4蛋白保守的E1结构域中的半胱氨酸残基在体外Urm1硫代羧酸产物形成的过程中不是必需的，但在体内Urm1蛋白连接的过程中却是必不可少的。该半胱氨酸残基在Urm1-RHD连接产物（该产物是Urm1蛋白C末端硫代羧酸产物而不是Urm1蛋白与靶蛋白之间的连接产物）的还原裂解反应中发挥作用。可能是E1样酶的半胱氨酸残基与RHD结构域间进行过硫化物交换，释放出RHD巯基，攻击Urm1蛋白-腺嘌呤核苷酸（Urm1-adenylate）；又或者是Urm1蛋白-腺嘌呤核苷酸直接被底物的赖氨酸残基攻击，不过该机制无法解释为什么需要两个Uba4蛋白活性位点中的半胱氨酸残基。Urm1-RHD二硫化物的还原裂解反应是被E1结构域活性位点的巯基基团催化完成的，该反应能使RHD巯基再生，能够再次参与形成Urm1硫酯化合物。我们还不清楚这种Urm1蛋白与靶蛋白间的连接机制是否能真实地反映早期前体物质及其它UBL蛋白的连接机制。不过我们相信，在UBL蛋白连接酶系统的进化历程中，出现了一种独特的E2样因子，逐渐使得E1酶丢失了RHD结构域，因此，也去除了过硫化物-硫代羧酸产物（persulphide–thiocarboxylate）形成的这一副反应。或者，真核生物UBL修饰系统可能来自另一种独特的原核β-grasp蛋白修饰系统。</p>
+<p>**3.3 E2酶的缘起与UBL特异性蛋白酶体</p>
+<p>**E2样酶源自何时，它又是在何时第一次与E1酶形成E1–E2系统用于UBL修饰途径的？早期的序列比对工作没有在细菌中发现任何与E2酶相关的蛋白，但是最近的研究工作却在同一DNA“邻居”（即在假定的操纵子中，结构域融合区域或共调控基因中）中发现了大量的E2相关序列，这些序列包括UBL相关序列、E1样序列或JAMM（JAB1/MPN/Mov34）金属蛋白酶编码序列等。在真核生物中，有特殊的JAMM蛋白酶来作为去泛素化酶或UBL特异性蛋白酶。</p>
+<p>因此，E2蛋白似乎来自细菌，伴随着UBL蛋白和E1样酶一起发展而来。与经典的UBL系统E2酶最接近的亚群蛋白可能就是真核生物UBL系统中E2酶的祖先。虽然到目前为止还没有报道有一个这种原核生物的E2样酶能够与E1酶一起催化UBL与底物间的反应，不过根据其它研究成果，我们相信肯定会有一些原核生物的E2样酶能够催化这种反应。</p>
+<p>DUB蛋白或ULP蛋白通常都是UBL蛋白前体物质C末端反应所必需的蛋白，它们可以将UBL蛋白从靶蛋白上裂解下来。虽然经序列分析发现有多种JAMM酶与原核细胞里的UBL修饰系统有关，不过还是有一些JAMM酶只是参与硫转运途径，而不参与UBL修饰途径。比如结核分支杆菌（Mycobacterium tuberculosis）具有一种特殊的半胱氨酸合成途径。该途径由E1相关的MoeZ蛋白催化。途径中含有包含β-grasp结构的CysO硫代羧酸衍生物。JAMM酶编码基因与CysO编码基因成簇存在，它也许能在半胱氨酸生物合成的最后一步中将CysO中的半胱氨酸水解出来。萤光假单胞菌（Pseudomonas fluorescens）中合成含硫的thioquinolobactin菌属转铁蛋白（siderophore）需要一名为QbsE的硫转运蛋白参与，该蛋白与MoaD蛋白和ThiS蛋白相关。不过QbsE蛋白以在双甘氨酸基序（diglycine motif）后添加了两个氨基酸残基的前体物质形式存在。JAMM蛋白酶可以将QbsE前体蛋白中的这两个氨基酸残基水解掉。因此，真核生物用来去除UBL蛋白的蛋白酶可能就来自细菌中以β-grasp结构蛋白为基础的生物合成途径，比如UBL蛋白和E1样酶，可能E2样酶也是如此。</p>
+<p>**3.4 E1样酶对非UBL底物的活化作用</p>
+<p>**腺苷化酶（adenylating enzyme）里的E1样酶超家族蛋白除了能活化β-grasp蛋白的C末端之外，还能催化一系列的生化反应。最好的例子来自能合成并分泌小分子抗菌素C7（small antibiotic microcin C7, MccC7）的肠道细菌。MccC7是一种由大肠杆菌质粒编码的小分子7肽。MccC7多肽C末端的天冬酰胺酰类似物（isoasparaginyl）与经修饰的腺嘌呤核苷酸之间形成了氨基磷酸酯键（phosphoramidate）。该连接反应需要同一质粒编码的mccB蛋白的参与，而mccB蛋白属于E1样酶超家族。因此，这种E1样酶蛋白的底物不是β-grasp蛋白，该酶所修饰的C末端也与前面介绍的硫转运系统不同，只不过最开始与由E1样酶催化的C末端α羧化物（α-carboxylate）的腺苷酰化作用比较类似。</p>
+<p>**4. 前景展望</p>
+<p>**将来还会发现多少种UBL蛋白修饰途径或者相似的途径？很多UBL修饰途径无法通过序列比对的方法被发现，因此可能还有很多β-grasp蛋白或者UBL修饰因子没有被我们发现。令人兴奋的是，我们在原核生物中发现了大量UBL相关蛋白修饰系统，虽然这些系统中还没有一个系统经过试验验证。对这些系统进行序列分析发现，有大量的细菌调节子都将所有编码β-grasp蛋白、E1样蛋白、E2样蛋白以及相关水解蛋白的基因全部集中到一起。此外还发现，不是所有的E1样蛋白都能与β-grasp蛋白或UBL蛋白发生反应，因此还需要对这些酶的作用进行更深入的研究。</p>
+<p>反过来，可能还存在一种胞内的蛋白间结合机制，该机制并不需要E1样酶和β-grasp蛋白的参与，比如内蛋白（intein）介导的蛋白反式剪接机制等。在结核分支杆菌中有一种名为Pup的原核生物泛素样蛋白，该蛋白由64个氨基酸残基组成，它可以在体内对一些特定蛋白进行修饰，使它们被结合杆菌的蛋白酶体所降解。Pup蛋白既不是β-grasp蛋白也不是UBL蛋白，它通过C末端的谷氨酰胺位点与靶蛋白的赖氨酸位点相连。Pup蛋白末端的谷氨酰胺在与底物连接时或连接之前会转变为谷氨酸。类似的酰胺连接反应也见于谷氨酰胺转移酶反应和谷光苷肽合成途径中的γ谷氨酰半胱氨酸合成酶（γ-glutamylcysteine synthetases）反应。实际上，结合杆菌里的PafA蛋白与γ谷氨酰半胱氨酸合成酶和谷氨酰胺合成酶在序列上相似性很低。质谱研究和蛋白质组学研究可能会给我们带来更多的信息。从蛋白质组学这个更宽广的角度来看，蛋白间的相互连接反应可以看做是细胞调控手段中运用最为普遍，功能最多样的一种方式，我们现在只是看到了冰山一角而已。</p>
+<p>原文检索：<br>Mark Hochstrasser. (2009) Origin and function of ubiquitin-like proteins. <em>Nature</em>, 458:422-429.<br>YORK/编译</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/06/10/%E6%B3%9B%E7%B4%A0%E6%A0%B7%E8%9B%8B%E7%99%BD%E7%9A%84%E6%9D%A5%E6%BA%90%E5%8F%8A%E5%8A%9F%E8%83%BD/" data-id="ckb89e4kr0000t4hj0p345nr9" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E6%91%98%E6%8A%84/" rel="tag">网络摘抄</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux%E8%BD%AF%E4%BB%B6/" rel="tag">Linux软件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E6%91%98%E6%8A%84/" rel="tag">网络摘抄</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Linux%E8%BD%AF%E4%BB%B6/" style="font-size: 10px;">Linux软件</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E6%91%98%E6%8A%84/" style="font-size: 20px;">网络摘抄</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/06/10/RNA-seq%E4%B8%8EChIP-seq%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B8%8E%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%8A%E7%AF%87%EF%BC%89/">RNA-seq与ChIP-seq数据处理与分析实战（上篇）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/RNA-seq%E4%B8%8EChIP-seq%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B8%8E%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%AD%E7%AF%87%EF%BC%89/">RNA-seq与ChIP-seq数据处理与分析实战（中篇）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/ChIP-Seq%E5%88%86%E6%9E%90%E5%B0%8F%E5%AE%9E%E6%88%98%EF%BC%88%E4%BA%8C%EF%BC%89/">ChIP-Seq分析小实战（二）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/ChIP-Seq%E5%88%86%E6%9E%90%E5%B0%8F%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%80%EF%BC%89/">ChIP-Seq分析小实战（一）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/BETA%E8%BD%AF%E4%BB%B6%E7%9A%84%E6%95%B4%E5%90%88Chip-seq%E5%92%8CRNA-seq/">BETA软件的整合Chip-seq和RNA-seq</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

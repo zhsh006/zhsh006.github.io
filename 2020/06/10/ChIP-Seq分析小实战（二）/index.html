@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>ChIP-Seq分析小实战（二） | 七星传</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="在ChIP-Seq分析小实战（一）中以将数据做好了准备，接着就是按照文章中所述将ChIP-seq数据用botwie比对至NCBIM37基因组上，但是这次我还是按照教程的方法，使用bowtie2比对至mm10基因组上  The millions of reads produced by ChIP-seq of RYBP, Cbx7, Ring1B, Suz12,and H2AK119Ub were">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ChIP-Seq分析小实战（二）">
+<meta property="og:url" content="http://yoursite.com/2020/06/10/ChIP-Seq%E5%88%86%E6%9E%90%E5%B0%8F%E5%AE%9E%E6%88%98%EF%BC%88%E4%BA%8C%EF%BC%89/index.html">
+<meta property="og:site_name" content="七星传">
+<meta property="og:description" content="在ChIP-Seq分析小实战（一）中以将数据做好了准备，接着就是按照文章中所述将ChIP-seq数据用botwie比对至NCBIM37基因组上，但是这次我还是按照教程的方法，使用bowtie2比对至mm10基因组上  The millions of reads produced by ChIP-seq of RYBP, Cbx7, Ring1B, Suz12,and H2AK119Ub were">
+<meta property="article:published_time" content="2020-06-09T18:40:58.000Z">
+<meta property="article:modified_time" content="2020-06-09T18:44:54.742Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="网络摘抄">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="七星传" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">七星传</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-ChIP-Seq分析小实战（二）" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/06/10/ChIP-Seq%E5%88%86%E6%9E%90%E5%B0%8F%E5%AE%9E%E6%88%98%EF%BC%88%E4%BA%8C%EF%BC%89/" class="article-date">
+  <time datetime="2020-06-09T18:40:58.000Z" itemprop="datePublished">2020-06-10</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      ChIP-Seq分析小实战（二）
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在ChIP-Seq分析小实战（一）中以将数据做好了准备，接着就是按照文章中所述将ChIP-seq数据用botwie比对至NCBIM37基因组上，但是这次我还是按照教程的方法，使用bowtie2比对至mm10基因组上</p>
+<blockquote>
+<p>The millions of reads produced by ChIP-seq of RYBP, Cbx7, Ring1B, Suz12,<br>and H2AK119Ub were aligned with the mouse genome (version NCBIM37)using the Bowtie (Langmead et al., 2009) tool version 0.12.7; two mismatches<br>were allowed within the seed alignment</p>
+</blockquote>
+<h4 id="Mapping-reads"><a href="#Mapping-reads" class="headerlink" title="Mapping reads"></a>Mapping reads</h4><p>由于用fastqc质控后，发现Ring1B、Suz12和IgG_old样本的3’端有大约5个bp长度的碱基质量不是太好（大概在Q25左右），按照原来是惯例应该用软件将其剪去，但是看了教程发现可以用bowtie2中的参数在比对时进行处理，去官网手册上查了下</p>
+<p><code>-3/--trim3</code> Trim bases from 3’ (right) end of each read before alignment (default: 0)</p>
+<p><code>--local</code> In this mode, Bowtie 2 does not require that the entire read align from one end to the other. Rather, some characters may be omitted (“soft clipped”) from the ends in order to achieve the greatest possible alignment score</p>
+<p>其实我们在用bowtie2时默认是使用<code>--end-to-end</code>，但是其是要求 entire read align from one end to the other, without any trimming (or “soft clipping”) of characters from either end，所以在使用<code>-3/--trim3</code>参数时，需要再加个<code>--local</code>参数</p>
+<p>即比对代码如下，由于机子较差，因此将样本一个个运行，写了简单的shell脚本，同时将比对结果输出到log文件中，然后用samtools将sam文件转化成bam文件，并排序</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#&#x2F;bin&#x2F;bashGENOME&#x3D;&#x2F;home&#x2F;anlan&#x2F;reference&#x2F;index&#x2F;bowtie2&#x2F;mm10&#x2F;mm10bowtie2 -p 5 --trim3 5 --local -x $GENOME -U SRR620204.fastq 2&gt; ring1B_bowtie2.log |samtools sort -O bam -@ 5 -o ring1B.bambowtie2 -p 5 --trim3 5 --local -x $GENOME -U SRR620205.fastq 2&gt; cbx7_bowtie2.log |samtools sort -O bam -@ 5 -o cbx7.bambowtie2 -p 5 --trim3 5 --local -x $GENOME -U SRR620206.fastq 2&gt; suz12_bowtie2.log |samtools sort -O bam -@ 5 -o suz12.bambowtie2 -p 5 --trim3 5 --local -x $GENOME -U SRR620207.fastq 2&gt; RYBP_bowtie2.log |samtools sort -O bam -@ 5 -o RYBP.bambowtie2 -p 5 --trim3 5 --local -x $GENOME -U SRR620208.fastq 2&gt; IgGold_bowtie2.log |samtools sort -O bam -@ 5 -o IgGold.bambowtie2 -p 5 --trim3 5 --local -x $GENOME -U SRR620209.fastq 2&gt; IgG_bowtie2.log |samtools sort -O bam -@ 5 -o IgG.bam</span><br></pre></td></tr></table></figure>
+
+<p>从比对结果上来看，比对率均并不高，如ring1B_bowtie2.log</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">19687027 reads; of these:      19687027 (100.00%) were unpaired; of these:        7960096 (40.43%) aligned 0 times        8614711 (43.76%) aligned exactly 1 time        3112220 (15.81%) aligned &gt;1 times59.57% overall alignment rate</span><br></pre></td></tr></table></figure>
+
+<p>最后别忘记对每个bam文件建索引，不然后续步骤会报错</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">samtools index ring1B.bam</span><br></pre></td></tr></table></figure>
+
+<h4 id="Peak-calling"><a href="#Peak-calling" class="headerlink" title="Peak calling"></a>Peak calling</h4><p>Peak calling可以理解为寻找peak出现的位置，而这些位置可能是一些靶蛋白结合的位点，我们做ChIP-seq也就是为了研究捕获到的序列以及其差异。至于其peak calling的原理以及我接下来使用的MACS2软件的原理可以参照<a href="https://www.plob.org/article/7227.html" target="_blank" rel="noopener">Chip-seq处理流程</a>，本来想贴这篇文章作者的博客链接的，结果发现博客打不开了！看了这文章后，大概能了解一点其统计学的含义</p>
+<p>软件的下载及安装，一看是python的软件，如果只是尝试使用，我一般选择bioconda安装（我已配置好了conda环境了）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda install -c bioconda macs2</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如果报错：CondaHTTPError: HTTP 000 CONNECTION FAILED for url &lt;<a href="https://nanomirrors.tuna.tsinghua.edu.cn/anaconda/cloud/bioconda/linux-64/repodata.json/>" target="_blank" rel="noopener">https://nanomirrors.tuna.tsinghua.edu.cn/anaconda/cloud/bioconda/linux-64/repodata.json&gt;</a></p>
+</blockquote>
+<p>说明墙太高了，那么需要对conda的源文件进行点处理（前提你已经给canda添加了清华源后还报错）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim ~&#x2F;.condarc删除 - defaults 的行</span><br></pre></td></tr></table></figure>
+
+<p>安装成功后就可以用macs2对每个bam文件进行call peaks了，简单看一下可能会用到的几个参数</p>
+<ul>
+<li>-t/–treatment 输入文件，支持很多格式，搭配-f/–format使用</li>
+<li>-f/–format 设定输入文件的格式，这里我会选择bam格式</li>
+<li>-c/–control 对照组（或者模拟的）数据，需要跟-t的输出文件在相同目录下</li>
+<li>-n/–name 输出文件（有很多个文件）的前缀</li>
+<li>–outdir 输出文件所在目录（不设定的话就默认当前目录了）</li>
+<li>-g/–gsize 提供基因组的大小，程序有默认的几个物种可以选hs,mm,ce,dm</li>
+<li>-q/–qvalue 设定FDR的阈值，默认是0.05</li>
+<li>-p/–pvalue 设定pvalue的阈值，如果参数设定了-p，则其会覆盖参数-q的作用</li>
+<li>-B/–bdg If this flag is on, MACS will store the fragment pileup, control lambda, -log10pvalue and -log10qvalue scores in bedGraph files.</li>
+</ul>
+<p>看到文章中有对macs2的软件参数的选择的</p>
+<blockquote>
+<p>Peaks with a FDR lower than 5% from Cbx7, Ring1B, Suz12, and H2AK119ub,<br>and lower than 1% from RYBP, were combined to detect chromosomal<br>regions for further analyses.</p>
+</blockquote>
+<blockquote>
+<p>We observed an overlap of RYBP peaks (3,918 in<br>total) with 14%, 42%, and 37% of Cbx7, Ring1B, and Suz12<br>peaks, respectively (false discovery rate [FDR] = 1%; p = 1 3<br>10-5) (Figure 1A</p>
+</blockquote>
+<p>所以对每个样本的macs2代码如下（选择的对照组的bam文件为IgGold.bam，不太了解IgG.bam在文中的作用）:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">macs2 callpeak -c IgGold.bam -t suz12.bam -p 1e-5 -f BAM -g mm -n suz12 2&gt; suz12.macs2.logmacs2 callpeak -c IgGold.bam -t ring1B.bam -p 1e-5 -f BAM -g mm -n ring1B 2&gt; ring1B.macs2.logmacs2 callpeak -c IgGold.bam -t cbx7.bam -p 1e-5 -f BAM -g mm -n cbx7 2&gt; cbx7.macs2.logmacs2 callpeak -c IgGold.bam -t RYBP.bam -p 1e-5 -f BAM -g mm -n RYBP 2&gt;RYBP.macs2.log</span><br></pre></td></tr></table></figure>
+
+<p>然后粗略看一下peak位置信息的文件，看看每个样本找到多少个peak（bed的格式，储存了每个peaks的位置信息）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wc -l *.bed</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>2198 cbx7_summits.bed<br>7072 ring1B_summits.bed<br>6872 RYBP_summits_2.bed<br>2 RYBP_summits.bed<br>6633 suz12_summits.bed</p>
+</blockquote>
+<p>回到文章中一看，cbx7、ring1B，RYBP和suz12对应的peaks number分别对应2754、6982、3918和8054。。除了RYBP相差的也太严重了，其他的样本也有点差别。RYBP样本肯定无法进行后续分析了，所以按照教程中所说的，从<a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE42466把RYBP样本的peaks文件下载下来用用" target="_blank" rel="noopener">https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE42466把RYBP样本的peaks文件下载下来用用</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget ftp:&#x2F;&#x2F;ftp.ncbi.nlm.nih.gov&#x2F;geo&#x2F;series&#x2F;GSE42nnn&#x2F;GSE42466&#x2F;suppl&#x2F;GSE42466_RYBP_peaks_5.txt.gzgunzip GSE42466_RYBP_peaks_5.txt.gzmv GSE42466_RYBP_peaks_5.txt RYBP_summits.bed</span><br></pre></td></tr></table></figure>
+
+<p>macs2 call peak出来各个文件的作用可以看官网介绍<a href="https://github.com/taoliu/MACS/" target="_blank" rel="noopener">https://github.com/taoliu/MACS/</a></p>
+<ul>
+<li>NAME_peaks.xls 包含called peaks的信息</li>
+<li>NAME_peaks.narrowPeak is BED6+4 format file which contains the peak locations together with peak summit, pvalue and qvalue</li>
+<li>NAME_summits.bed BED format, which contains the peak summits locations for every peaks.If you want to find the motifs at the binding sites, this file is recommended</li>
+</ul>
+<p>接下来应该就是对peaks进行注释，然后寻找其靶基因以及结合位点等</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/06/10/ChIP-Seq%E5%88%86%E6%9E%90%E5%B0%8F%E5%AE%9E%E6%88%98%EF%BC%88%E4%BA%8C%EF%BC%89/" data-id="ckb8a0z7u00001lhjgod972ia" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E6%91%98%E6%8A%84/" rel="tag">网络摘抄</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/06/10/RNA-seq%E4%B8%8EChIP-seq%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B8%8E%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%AD%E7%AF%87%EF%BC%89/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          RNA-seq与ChIP-seq数据处理与分析实战（中篇）
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/06/10/ChIP-Seq%E5%88%86%E6%9E%90%E5%B0%8F%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%80%EF%BC%89/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">ChIP-Seq分析小实战（一）</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux%E8%BD%AF%E4%BB%B6/" rel="tag">Linux软件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E6%91%98%E6%8A%84/" rel="tag">网络摘抄</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Linux%E8%BD%AF%E4%BB%B6/" style="font-size: 10px;">Linux软件</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E6%91%98%E6%8A%84/" style="font-size: 20px;">网络摘抄</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/06/10/RNA-seq%E4%B8%8EChIP-seq%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B8%8E%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%8A%E7%AF%87%EF%BC%89/">RNA-seq与ChIP-seq数据处理与分析实战（上篇）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/RNA-seq%E4%B8%8EChIP-seq%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B8%8E%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%AD%E7%AF%87%EF%BC%89/">RNA-seq与ChIP-seq数据处理与分析实战（中篇）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/ChIP-Seq%E5%88%86%E6%9E%90%E5%B0%8F%E5%AE%9E%E6%88%98%EF%BC%88%E4%BA%8C%EF%BC%89/">ChIP-Seq分析小实战（二）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/ChIP-Seq%E5%88%86%E6%9E%90%E5%B0%8F%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%80%EF%BC%89/">ChIP-Seq分析小实战（一）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/BETA%E8%BD%AF%E4%BB%B6%E7%9A%84%E6%95%B4%E5%90%88Chip-seq%E5%92%8CRNA-seq/">BETA软件的整合Chip-seq和RNA-seq</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>ChIP-seq基础入门 | 七星传</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="理解ChIP-Seq 到了目前这个水平，我学习新的高通量数据分析流程时已经不再考虑代码应该如何写的问题了。我更多要去考虑一个技术的目的和意义。 转录组主要研究的问题是基因在不同情况下的差异表达以及RNA结构变化等，而表观组研究的问题是在基因序列不变的情况下，基因的表达、调控和性状发生了可遗传变化的分子机制。也就是相同的DNA, RNA，蛋白质经过一定的修饰后会使得生物性状发生了改变。 ChIP-S">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ChIP-seq基础入门">
+<meta property="og:url" content="http://yoursite.com/2020/06/10/ChIP-seq%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/index.html">
+<meta property="og:site_name" content="七星传">
+<meta property="og:description" content="理解ChIP-Seq 到了目前这个水平，我学习新的高通量数据分析流程时已经不再考虑代码应该如何写的问题了。我更多要去考虑一个技术的目的和意义。 转录组主要研究的问题是基因在不同情况下的差异表达以及RNA结构变化等，而表观组研究的问题是在基因序列不变的情况下，基因的表达、调控和性状发生了可遗传变化的分子机制。也就是相同的DNA, RNA，蛋白质经过一定的修饰后会使得生物性状发生了改变。 ChIP-S">
+<meta property="og:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183753.png">
+<meta property="og:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183747.png">
+<meta property="og:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183757.png">
+<meta property="og:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183750.png">
+<meta property="og:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183754.png">
+<meta property="og:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183751.png">
+<meta property="og:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183748.png">
+<meta property="og:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183755.png">
+<meta property="og:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183752.png">
+<meta property="og:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183749.png">
+<meta property="og:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183756.png">
+<meta property="article:published_time" content="2020-06-09T18:34:23.000Z">
+<meta property="article:modified_time" content="2020-06-09T18:37:55.938Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="网络摘抄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183753.png">
+  
+    <link rel="alternate" href="/atom.xml" title="七星传" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">七星传</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-ChIP-seq基础入门" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/06/10/ChIP-seq%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" class="article-date">
+  <time datetime="2020-06-09T18:34:23.000Z" itemprop="datePublished">2020-06-10</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      ChIP-seq基础入门
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><strong>理解ChIP-Seq</strong></p>
+<p>到了目前这个水平，我学习新的高通量数据分析流程时已经不再考虑代码应该如何写的问题了。我更多要去考虑一个技术的目的和意义。</p>
+<p>转录组主要研究的问题是基因在不同情况下的差异表达以及RNA结构变化等，而表观组研究的问题是在基因序列不变的情况下，基因的表达、调控和性状发生了<strong>可遗传变化</strong>的分子机制。也就是相同的DNA, RNA，蛋白质经过一定的修饰后会使得生物性状发生了改变。</p>
+<p>ChIP-Seq仅仅是第一个表观遗传学领域比较成熟的技术而已，目前还有很多其他的技术，比如说</p>
+<ul>
+<li>DNA修饰: DNA甲基化免疫共沉淀技术（MeDIP), 目标区域甲基化，全基因组甲基化（WGBS)，氧化-重亚硫酸盐测序（oxBS-Seq), TET辅助重亚硫酸盐测序（TAB-Seq）</li>
+<li>RNA修饰: RNA甲基化免疫共沉淀技术（MeRIP)</li>
+<li>蛋白质与核酸相互作用： RIP-Seq, ChIP-Seq, CLIP-Seq</li>
+<li>还有最近比较火的ATAC-Seq</li>
+</ul>
+<p>2013年PNAS上面有一篇文章叫做 <em><a href="http://www.pnas.org/content/110/18/7101.long" target="_blank" rel="noopener">Epigenetics: Core misconcept</a></em> 讲了几点关于表观遗传学,大家的理解错误的地方。</p>
+<p>本次主要是分析ChIP-Seq的高通量测序结果，因此，先介绍什么是ChIP-Seq.</p>
+<p>所谓的ChIP-Seq其实就是把ChIP实验做完得到的DNA不仅仅用来跑胶，还送去高通量测序了。重点在于ChIP，也就是染色体免疫共沉淀（Chromatin Immunoprecipitation）是用来解决什么科学问题的。毕竟数据分析不是目的，它只是解决问题的一种手段。</p>
+<blockquote>
+<p>ChIP被用来研究细胞内DNA与蛋白质相互作用，具体来说就是确定特定蛋白（如转录因子）是否结合特定基因组区域（如启动子或其它DNA结合位点）——可能定义顺反组。ChIP还被用来确定基因组上与组蛋白修饰相关的特定位点（即组蛋白修饰酶类的靶标） - 来自维基百科。</p>
+</blockquote>
+<p>ChIP的实验我从来没有做过，所以只能从网上找来大致的流程，简单分为</p>
+<p>第一步： 将蛋白交联到DNA上。 也就是保证蛋白和DNA能够结合，找到互作位点。</p>
+<p>第二步： 通过超声波剪切DNA链。</p>
+<p>第三步： 加上附上抗体的磁珠用于免疫沉淀靶蛋白。抗体很重要</p>
+<p>第四步： 接触蛋白交联；纯化DNA</p>
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-8831-2013053-d09d27cbc6fa4c82.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183753.png" alt="ChIP-seq基础入门"></a></p>
+<p>实验流程</p>
+<p>如果送去测序就是ChIP-Seq, 后续就是对应分析流程，分析分为4步：</p>
+<ul>
+<li>质量控制， 用到的是FastQC</li>
+<li>序列比对，Bowtie2或这BWA</li>
+<li>peak calling, 建议用MACS</li>
+<li>peak注释， 推荐Y叔的ChIPseeker</li>
+</ul>
+<h2 id="文章中ChIP-Seq解决的问题"><a href="#文章中ChIP-Seq解决的问题" class="headerlink" title="文章中ChIP-Seq解决的问题"></a>文章中ChIP-Seq解决的问题</h2><p>这部分看看这篇文章想解决什么问题，以及ChIP-Seq解决了什么问题。工具一定要为目的服务。</p>
+<p>PS: 可以先去把数据下载了，再看这个部分</p>
+<p><strong>文章的研究内容：</strong></p>
+<p>PRC1(Polycomb repressive complex 1)与干细胞命运决定有关。PRC1的组成非常的复杂，原文这样写道：</p>
+<blockquote>
+<p>The protein families that constitute the core of PRC1 contain several members: Cbx (Cbx2, Cbx4, Cbx6, Cbx7, or Cbx8); Ring1A or Ring1B; PHC (PHC1, PHC2, or PHC3); PCGF (PCGF1, PCGF2, PCGF3, PCGF4, PCGF5, or PCGF6); and RYBP or YAF2. Each combination establishes the subtype of PRC1 complexes</p>
+</blockquote>
+<p>文章想解决的问题是：</p>
+<ol>
+<li>PRC1复合体两类亚型的全基因组定位</li>
+<li>两类复合体调节的基因表达是否有差异</li>
+<li>Cbx7，RYBP是否有共同或独特的生物学功能</li>
+<li>Cbx7，RYBP在染色质的定位是否是<strong>相互依赖</strong></li>
+</ol>
+<p>得到的部分答案是：小鼠中有两个互斥的PRC1复合体的变异体，Cbx7和RYBP。Cbx7和RYBP的在基因组上的结合在同一个位置，但是同样互斥，不能共存。 Cbx7用于招募Ring1B结合到染色质，RYBP增加PRC1酶活性。 RYBP所结合的基因，有着较低水平Ring1B和H2AK119ub的水平，表达量高于Cbx7结合态。RYBP和Cbx7的在基因位点的结合情况还与代谢调节，细胞周期过程有关。</p>
+<p><strong>ChIP的用途：</strong></p>
+<p>为了解决PRC1亚型的定位问题， 作者对PRC1复合体的组成Cbx7, Ring1B, RYBP, 以及PRC2的Suz12f分别做了ChIP-Seq. 然后就是画了很多韦恩图看不同蛋白的靶基因的相互关系。还看了不同蛋白在基因的上的位置。</p>
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-1895-2013053-5067f5d1f3cf10f0.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183747.png" alt="ChIP-seq基础入门"></a></p>
+<p>一般而言，ChIP-Seq基本就是得到上面这些图，根据疑问再找到某一些基因看调控蛋白的结合和定位。本次实战也就是尝试做出这些图。</p>
+<p>根据原文，ChIP-Seq的流程如下：</p>
+<ul>
+<li>先用<strong>Bowtie</strong>（0.12.7）把RYBP, Cbx7, Ring1B, Suz12,和H2AK11Ub的ChIP-Seq产生短读(reads) 比对到小鼠的参考基因组上（NCBIM37），参数允许seed联配时有2个错配。</li>
+<li>使用MACS（1.4.1）寻找可能的结合位点，也就是基因组中大量短读片段富集的区域。MACS比较这些区域在对照组和实验组的差异，选择p值等于10e-5作为阈值。 之后PDR低于5%的Cbx7, Ring1B, Suz12和H2AK119ub的peak和PDR低于1%的RYBP的peak结合用于进一步分析</li>
+</ul>
+<blockquote>
+<p>这一步看起来就很复杂，之后会重点进行学习</p>
+</blockquote>
+<ul>
+<li>在基因内部或距离TSS 2.5kb的 peak 被认为是靶基因。 每个TSS附近5Kb区域，并且与一个或多个ChIP-Seq(RYBP,Ring1B, Cbx7, Suz12, H2AK119ub)结果关联，用于计算ChIP-Seq表达谱和全ChIP-Seq覆盖度。</li>
+<li>使用BEDtools 计算TSS附近ChIP-Seq表达谱</li>
+</ul>
+<p>ChIP-Seq数据分析的流程难点在于找到peak，所以peak calling这一阶段的软件选择比较重要，目前常用的是MACS2, 实际分析建议多用几个软件。目前常用的是MACS2, 实际分析建议多用几个软件。</p>
+<h2 id="数据下载和质量控制"><a href="#数据下载和质量控制" class="headerlink" title="数据下载和质量控制"></a>数据下载和质量控制</h2><p>这部分下载ChIP-Seq数据，以及小鼠的参考基因组，注释。</p>
+<ul>
+<li>下载测序数据，并用sratoolkit解压缩文章提供的GEO是GSE42466，可以在<a href="https://www.ncbi.nlm.nih.gov/geo/" target="_blank" rel="noopener">https://www.ncbi.nlm.nih.gov/geo/</a> 检索到对应的数据集</li>
+</ul>
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-4261-2013053-1f008758943f16f5.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183757.png" alt="ChIP-seq基础入门"></a></p>
+<p>GEO</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># 我习惯将数据保存到项目文件夹下的data中 mkdir -p GSE42466&#x2F;data&#x2F;chip-seq cd GSE42466&#x2F;data&#x2F;chip-seq for ((i&#x3D;204;i&lt;&#x3D;209;i++)); do   wget -4 -q ftp:&#x2F;&#x2F;ftp-trace.ncbi.nlm.nih.gov&#x2F;sra&#x2F;sra-instant&#x2F;reads&#x2F;ByStudy&#x2F;sra&#x2F;SRP&#x2F;SRP017&#x2F;SRP017311&#x2F;SRR620$i&#x2F;SRR620$i.sra;   ~&#x2F;miniconda&#x2F;envs&#x2F;biostar&#x2F;bin&#x2F;fastq-dump –split-3 SRR620$i.sra; done &amp;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>下载小鼠参考基因组的索引和注释文件, 这里用常用的mm10</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># 索引大小为3.2GB， 不建议自己下载基因组构建 mkdir referece &amp;&amp; cd reference wget -4 -q ftp:&#x2F;&#x2F;ftp.ccb.jhu.edu&#x2F;pub&#x2F;data&#x2F;bowtie2_indexes&#x2F;mm10.zip unzip mm10.zip</span><br></pre></td></tr></table></figure>
+
+<p>注释文件到<a href="https://genome.ucsc.edu/cgi-bin/hgTables" target="_blank" rel="noopener">https://genome.ucsc.edu/cgi-bin/hgTables</a> 选取保存。</p>
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-4057-2013053-d6f72a4f1f69d359.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183750.png" alt="ChIP-seq基础入门"></a></p>
+<p>或者用curl进行下载。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl &#39;https:&#x2F;&#x2F;genome.ucsc.edu&#x2F;cgi-bin&#x2F;hgTables?hgsid&#x3D;603641571_MKLxB78UAcjaI3oj5YiFCA0Ms86o&amp;boolshad.hgta_printCustomTrackHeaders&#x3D;0&amp;hgta_ctName&#x3D;tb_refGene&amp;hgta_ctDesc&#x3D;table+browser+query+on+refGene&amp;hgta_ctVis&#x3D;pack&amp;hgta_ctUrl&#x3D;&amp;fbQual&#x3D;whole&amp;fbUpBases&#x3D;200&amp;fbExonBases&#x3D;0&amp;fbIntronBases&#x3D;0&amp;fbDownBases&#x3D;200&amp;hgta_doGetBed&#x3D;get+BED&#39; &gt; mm10_refSeq.bed</span><br></pre></td></tr></table></figure>
+
+<p>得到的fastq文件，一般而言都是上机得到的原始数据，也有可能是经过质量控制的结果，但是无论如何都得自己去检查一下。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">## 需要安装fastqc 和 multiqc # 先获取QC结果 ls *gz | while read id; do fastqc -t 4 $id; done # multiqc multiqc *fastqc.zip --pdf</span><br></pre></td></tr></table></figure>
+
+<p>根据质控结果，发现序列的前后几个碱基质量不好，因此在比对的时候会主动忽略。</p>
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-1809-2013053-3630d6c9df566fab.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183754.png" alt="ChIP-seq基础入门"></a></p>
+<p>今后，可能会去下载其他实验的数据，还要进行质量控制，所以就写一个Python脚本进行流程化操作。脚本命名为<code>sra2qc.py</code>，保存在我的GitHub上</p>
+<h2 id="序列比对"><a href="#序列比对" class="headerlink" title="序列比对"></a>序列比对</h2><p>这一步非常简单， 就是将得到fastq文件用bowtie2比对小鼠参考基因组上，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bowtie2 -p 6 -3 5 --local -x reference&#x2F;mm10 -U ChIP-Seq&#x2F;SRR620204.fastq | ~&#x2F;miniconda3&#x2F;bin&#x2F;samtools sort -O bam -o ..&#x2F;analysis&#x2F;alignment&#x2F;ring1B.bam bowtie2 -p 6 -3 5 --local -x reference&#x2F;mm10 -U ChIP-Seq&#x2F;SRR620205.fastq | ~&#x2F;miniconda3&#x2F;bin&#x2F;samtools sort -O bam -o ..&#x2F;analysis&#x2F;alignment&#x2F;cbx7.bam bowtie2 -p 6 -3 5 --local -x reference&#x2F;mm10 -U ChIP-Seq&#x2F;SRR620206.fastq | ~&#x2F;miniconda3&#x2F;bin&#x2F;samtools sort -O bam -o ..&#x2F;analysis&#x2F;alignment&#x2F;suz12.bam bowtie2 -p 6 -3 5 --local -x reference&#x2F;mm10 -U ChIP-Seq&#x2F;SRR620207.fastq | ~&#x2F;miniconda3&#x2F;bin&#x2F;samtools sort -O bam -o ..&#x2F;analysis&#x2F;alignment&#x2F;RYBP.bam bowtie2 -p 6 -3 5 --local -x reference&#x2F;mm10 -U ChIP-Seq&#x2F;SRR620208.fastq | ~&#x2F;miniconda3&#x2F;bin&#x2F;samtools sort -O bam -o ..&#x2F;analysis&#x2F;alignment&#x2F;IgGold.bam bowtie2 -p 6 -3 5 --local -x reference&#x2F;mm10 -U ChIP-Seq&#x2F;SRR620209.fastq | ~&#x2F;miniconda3&#x2F;bin&#x2F;samtools sort -O bam -o ..&#x2F;analysis&#x2F;alignment&#x2F;IgG.bam</span><br></pre></td></tr></table></figure>
+
+<p>我对比对结果进行了简单的统计，发现比对率其实不太高. 虽然在RNA-Seq是要求80~90%的比对率，但是在ChIP-Seq上，我没有具体了解过。</p>
+<table>
+<thead>
+<tr>
+<th align="left">样品</th>
+<th align="left">比对到单个区域</th>
+<th align="left">比对到多个区域</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">ring1B</td>
+<td align="left">43.76%</td>
+<td align="left">15.81%</td>
+</tr>
+<tr>
+<td align="left">cbx7</td>
+<td align="left">39.39%</td>
+<td align="left">17.49%</td>
+</tr>
+<tr>
+<td align="left">suz12</td>
+<td align="left">48.88%</td>
+<td align="left">17.17%</td>
+</tr>
+<tr>
+<td align="left">RYBP</td>
+<td align="left">58.76%</td>
+<td align="left">28.12%</td>
+</tr>
+<tr>
+<td align="left">IgGold</td>
+<td align="left">54.54%</td>
+<td align="left">27.21%</td>
+</tr>
+<tr>
+<td align="left">IgG</td>
+<td align="left">57.83%</td>
+<td align="left">25.45%</td>
+</tr>
+</tbody></table>
+<p>比对的结果，可以打开IGV查看，和RNA-Seq最大的区别在于你能看到明显的峰，这就是peak。这类peak在全基因组上特别的多，我们无法用肉眼直接选择，因此就需要借助专门的工具查找。</p>
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-1423-2013053-9d8c55ce9e79892d.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183751.png" alt="ChIP-seq基础入门"></a></p>
+<blockquote>
+<p>一般ChIP-Seq都需要提供一个对照组，也就是图中IgG。很明显的发现其他实验组有峰的区域在对照组中是没有的。而实验组没有峰的区域，对照组也没有，这样子就能提出背景噪声。</p>
+</blockquote>
+<h2 id="peak-calling"><a href="#peak-calling" class="headerlink" title="peak calling"></a>peak calling</h2><p>peak calling要用到MACS, 建议用ananconda安装, 因为可以选择合适的Python环境。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda create -n macs python&#x3D;2 source activate macs pip install MACS2</span><br></pre></td></tr></table></figure>
+
+<p>macs2包含一系列的子命令，其中最主要的就是<code>callpeak</code>， 官方提供了使用实例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">macs2 callpeak -t ChIP.bam -c Control.bam -f BAM -g hs -n test -B -q 0.01</span><br></pre></td></tr></table></figure>
+
+<p>一般而言，我们照葫芦画瓢，按照这个实例替换对应部分就行了，介绍一下各个参数的意义</p>
+<ul>
+<li>-t: 实验组的输出结果</li>
+<li>-c: 对照组的输出结果</li>
+<li>-f: -t和-c提供文件的格式，可以是”ELAND”, “BED”, “ELANDMULTI”, “ELANDEXPORT”, “ELANDMULTIPET” (for pair-end tags), “SAM”, “BAM”, “BOWTIE”, “BAMPE” “BEDPE” 任意一个。如果不提供这项，就是自动检测选择。</li>
+<li>-g: 基因组大小， 默认提供了hs, mm, ce, dm选项， 不在其中的话，比如说拟南芥，就需要自己提供了。</li>
+<li>-n: 输出文件的前缀名</li>
+<li>-B: 会保存更多的信息在bedGraph文件中，如fragment pileup, control lambda, -log10pvalue and -log10qvalue scores</li>
+<li>-q: q值，也就是最小的PDR阈值， 默认是0.05。q值是根据p值利用BH计算，也就是多重试验矫正后的结果。</li>
+<li>-p： 这个是p值，指定p值后MACS2就不会用q值了。</li>
+<li>-m: 和MFOLD有关，而MFOLD和MACS预构建模型有关，默认是5：50，MACS会先寻找100多个peak区构建模型，一般不用改，因为你不懂。</li>
+</ul>
+<blockquote>
+<p>原文写到：MACS estimated the FDR by comparing the peaks obtained from the samples with those from the control samples, using the same p value cutoff (10e-5). 估计就是指文章用了q=0.05或0.01</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">macs2 callpeak -c IgGold.bam -t suz12.bam -q 0.05 -f BAM -g mm -n suz12 2&gt; suz12.macs2.log &amp; macs2 callpeak -c IgGold.bam -t ring1B.bam -q 0.05 -f BAM -g mm -n ring1B 2&gt; ring1B.macs2.log &amp; macs2 callpeak -c IgG.bam -t cbx7.bam -q 0.05 -f BAM -g mm -n cbx7 2&gt; cbx7.macs2.log &amp; macs2 callpeak -c IgG.bam -t RYBP.bam -q 0.01 -f BAM -g mm -n RYBP 2&gt;RYBP.macs2.log &amp;</span><br></pre></td></tr></table></figure>
+
+<p>可以看下找到了多个peak，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wc -l *bed   2384 cbx7_summits.bed   8342 ring1B_summits.bed      0 RYBP_summits.bed   7619 suz12_summits.bed</span><br></pre></td></tr></table></figure>
+
+<p>结果显示RYBP无peak，估计是数据上传错误，我们可以下载作者上传的peak数据。此外ring1B我找了8000多个，但是原文是7000个，或许要修改阈值。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget ftp:&#x2F;&#x2F;ftp.ncbi.nlm.nih.gov&#x2F;geo&#x2F;series&#x2F;GSE42nnn&#x2F;GSE42466&#x2F;suppl&#x2F;GSE42466_Suz12_peaks_10.txt.gz gzip -d GSE42466_Suz12_peaks_10.txt.gz mv GSE42466_RYBP_peaks_5.txt RYBP2_summits.bed</span><br></pre></td></tr></table></figure>
+
+<p>结果文件不只是上述提到的一类，还有如下格式：</p>
+<ul>
+<li>NAME_peaks.xls: 以表格形式存放peak信息，虽然后缀是xls，但其实能用文本编辑器打开，和bed格式类似，但是<strong>以1为基</strong>，而bed文件是<strong>以0为基</strong>.也就是说xls的坐标都要减一才是bed文件的坐标</li>
+<li>NAME_peaks.narrowPeak NAME_peaks.broadPeak 类似。后面4列表示为， integer score for display， fold-change，-log10pvalue，-log10qvalue，relative summit position to peak start。内容和NAME_peaks.xls基本一致，适合用于导入R进行分析。</li>
+<li>NAME_summits.bed：记录每个peak的peak summits，话句话说就是记录极值点的位置。MACS建议用该文件寻找结合位点的motif。</li>
+<li>NAME_model.r，能通过<code>$ Rscript NAME_model.r</code>作图，得到是基于你提供数据的peak模型。</li>
+</ul>
+<p>这一部分的工作主要是学习MACS2软件使用方法和参数的含义，难度不大。目标是找到候选靶基因。</p>
+<h2 id="结果注释和可视化"><a href="#结果注释和可视化" class="headerlink" title="结果注释和可视化"></a>结果注释和可视化</h2><p>当我们得到上一步的输出文件后，下一步就是得到文章的结果。用的是Y叔的ChIPseeker，一个充满故事的R包，搜索一下就能看到Y叔的往事。</p>
+<p>ChIPseeker的功能分为三类:</p>
+<ul>
+<li>注释：提取peak附近最近的基因， 注释peak所在区域</li>
+<li>比较：估计ChIP peak数据集中重叠部分的显著性；整合GEO数据集，以便于将当前结果和已知结果比较</li>
+<li>可视化： peak的覆盖情况；TSS区域结合的peak的平均表达谱和热图；基因组注释；TSS距离；peak和基因的重叠</li>
+</ul>
+<p>完全符合我们的需要，都不需要用到<code>bedtools</code>和<code>deeptools</code>。</p>
+<p>在正式的工作开始之前，我们需要加载<code>ChIPseeker</code>, 基因组注释包和bed数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># biocLite(&quot;ChIPseeker&quot;) # biocLite(&quot;org.Mm.eg.db&quot;) # biocLite(&quot;TxDb.Mmusculus.UCSC.mm10.knownGene&quot;) library(&quot;ChIPseeker&quot;) # 根据自己存放文章具体地址修改，保证导入的数据是BED格式 ring1B &lt;- readPeakFile(&quot;F:&#x2F;Data&#x2F;ChIP&#x2F;ring1B_peaks.narrowPeak&quot;) cbx7 &lt;- readPeakFile(&quot;F:&#x2F;Data&#x2F;ChIP&#x2F;cbx7_peaks.narrowPeak&quot;) RYBP &lt;- readPeakFile(&quot;F:&#x2F;Data&#x2F;ChIP&#x2F;RYBP2_summits.bed&quot;) suz12 &lt;- readPeakFile(&quot;f:&#x2F;Data&#x2F;ChIP&#x2F;suz12_peaks.narrowPeak&quot;)</span><br></pre></td></tr></table></figure>
+
+<p>得到最基本的peak数据后，我们要做以下事情</p>
+<ul>
+<li>大量的韦恩图，描述不同蛋白结合基因的关系</li>
+<li>不同蛋白在染色体结合位点与TSS的距离</li>
+</ul>
+<p>为了完成上面说的两件事情，我们需要注释peak，准备TSS所在位置然后把peak比对到这些区域.</p>
+<p><strong>注：</strong> 原文提供不同蛋白的交集的基因TSS区域，所以要先做注释。</p>
+<p>关于peak注释一定要多说几句：</p>
+<ul>
+<li>启动子区域目前没有明确定义，一般认为基因起始转录位点的上下游区域是启动子区域，文章认为是TSS2.5 kb 以内都是靶基因</li>
+<li>注释有两类，genomic annotation和nearest gene annotation. 前者是研究直接调控对象，后者是做基因表达调控</li>
+<li>还有一类注释就是简单看peak上下游的范围的基因</li>
+</ul>
+<p>根据文章得知需要距离TSS一定距离的注释，以及peak上下5 Kb 的注释</p>
+<blockquote>
+<p>Genes with a peak within the gene body, or within 2.5 kb from the TSS, were considered to be target genes. An area of 5 kb surrounding each TSS that was associated to one or more ChIP-seq (RYBP, Ring1B, Cbx7, Suz12, or H2AK119ub) was used to calculate the ChIP-seq profile and the whole ChIP-seq coverage.</p>
+</blockquote>
+<p><code>ChIPseeker</code>负责注释的就是annotatePeak，提供了3类注释方式，符合文章的要求</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">peaks &lt;- list(ring1B, cbx7, RYBP, suz12)  peakAnnoList &lt;- lapply(peaks, annotatePeak, tssRegion&#x3D;c(-2500,2500), TxDb&#x3D;txdb,                         addFlankGeneInfo&#x3D;TRUE, flankDistance&#x3D;5000)</span><br></pre></td></tr></table></figure>
+
+<p>结果可以用as.GRanges或者as.data.frame查看。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">as.GRanges(peakAnnoList[[1]]) as.data.frame(peakAnnoList[[1]])</span><br></pre></td></tr></table></figure>
+
+<p>得到的结果会在原先的bed文件中增加额外的注释信息，你可以和之前导入的数据进行比较，比如说<code>geneId, transcriptId,distanceToTSS,flank_txIds</code>等。这些都保存后续作图所需要的信息。我们可以先看不同蛋白的靶位点的注释情况，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plotDistToTSS(peakAnnoList)</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-4668-2013053-21ce29be71b4c05d.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183748.png" alt="ChIP-seq基础入门"></a></p>
+<p>image.png</p>
+<p>原文大量的是不同蛋白结合基因的<strong>韦恩图</strong>，我们可以用更有趣的<code>UpSet</code>的点图</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">genes&#x3D; lapply(peakAnnoList, function(i) as.data.frame(i)$geneId) library(UpSetR) upset(fromList(genes))</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-4235-2013053-c770aabdc7377930.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183755.png" alt="ChIP-seq基础入门"></a></p>
+<p>不同蛋白靶基因的集合关系</p>
+<p>UpSet技术适用于多于5个集合表示情况，对于两个蛋白的靶基因的比较，大家更加喜欢韦恩图的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vennplot(genes[1:2])</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381020-8796-2013053-ce80b1a20b242674.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183752.png" alt="ChIP-seq基础入门"></a></p>
+<p>简单的韦恩图</p>
+<p>感觉没有原文那么高大上，主要原因就是没有上色，可以自行搜索找合适的软件作图。关于不同蛋白靶基因的集合关系图基本上就是这样子。</p>
+<p>下面是根据靶基因间的交集，绘制TSS距离图，比如说四个蛋白的重叠基因。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># 准备TSS区域，然后将peak映射到这些区域，得到tagMatrix fourgenes &lt;- intersect(genes[[1]],intersect(genes[[2]],intersect(genes[[3]],genes[[4]]))) target &lt;- select(txdb, keys&#x3D;fourgenes, columns&#x3D;c(&quot;TXID&quot;,&quot;GENEID&quot;), keytype &#x3D; &quot;GENEID&quot;) promoter &lt;- promoters(txdb, upstream &#x3D; 2500, downstream &#x3D; 2500) target_promoter &lt;- promoter[promoter$tx_id %in% target$TXID] tagMatrixList &lt;- lapply(peaks, getTagMatrix, window&#x3D;target_promoter) plotAvgProf(tagMatrixList , xlim &#x3D; c(-3000,2999))</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-1757-2013053-1cd82b9ed2c3e441.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183749.png" alt="ChIP-seq基础入门"></a></p>
+<p>TSS距离图</p>
+<p>感觉和原图有那么一点像，还可以画个热图</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tagHeatmap(tagMatrixList, xlim&#x3D;c(-2999, 3000), color&#x3D;NULL)</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://plobimage.ybzhao.com/wp-content/uploads/2019/12/1576381019-5159-2013053-a7bd32bd59729fed.png" target="_blank" rel="noopener"><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183756.png" alt="ChIP-seq基础入门"></a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/06/10/ChIP-seq%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" data-id="ckb8a0z86000b1lhjcvgw9l3b" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E6%91%98%E6%8A%84/" rel="tag">网络摘抄</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/06/10/%E9%A6%96%E6%AC%A1%E5%AF%B9%E9%98%BF%E5%B0%94%E8%8C%A8%E6%B5%B7%E9%BB%98%E7%97%87%E8%BF%9B%E8%A1%8C%E5%85%A8%E5%9F%BA%E5%9B%A0%E7%BB%84%E8%8C%83%E5%9B%B4H3K27ac%E5%8F%98%E5%8C%96%E7%A0%94%E7%A9%B6/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          首次对阿尔茨海默症进行全基因组范围H3K27ac变化研究
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/06/10/%E4%B8%80%E6%96%87%E4%BA%86%E8%A7%A3ATAC-seq/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">一文了解ATAC-seq</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux%E8%BD%AF%E4%BB%B6/" rel="tag">Linux软件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E6%91%98%E6%8A%84/" rel="tag">网络摘抄</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Linux%E8%BD%AF%E4%BB%B6/" style="font-size: 10px;">Linux软件</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E6%91%98%E6%8A%84/" style="font-size: 20px;">网络摘抄</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/06/10/RNA-seq%E4%B8%8EChIP-seq%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B8%8E%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%8A%E7%AF%87%EF%BC%89/">RNA-seq与ChIP-seq数据处理与分析实战（上篇）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/RNA-seq%E4%B8%8EChIP-seq%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B8%8E%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%AD%E7%AF%87%EF%BC%89/">RNA-seq与ChIP-seq数据处理与分析实战（中篇）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/ChIP-Seq%E5%88%86%E6%9E%90%E5%B0%8F%E5%AE%9E%E6%88%98%EF%BC%88%E4%BA%8C%EF%BC%89/">ChIP-Seq分析小实战（二）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/ChIP-Seq%E5%88%86%E6%9E%90%E5%B0%8F%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%80%EF%BC%89/">ChIP-Seq分析小实战（一）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/BETA%E8%BD%AF%E4%BB%B6%E7%9A%84%E6%95%B4%E5%90%88Chip-seq%E5%92%8CRNA-seq/">BETA软件的整合Chip-seq和RNA-seq</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

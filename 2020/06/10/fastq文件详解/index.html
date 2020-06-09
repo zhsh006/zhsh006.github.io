@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>fastq文件详解 | 七星传</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="从计算机的角度来说，生物的序列属于一种字符串，也是一种文本，因此生物信息分析属于文本处理范畴。文本存储为固定格式文件，生物信息的工作就是各种文本文件之间格式的转换，例如通过序列拼接将fastq转换为fasta，通过短序列比对将fastq与fasta合并为bam，通过变异检测将bam中突变位点提取出来转换为vcf。因此，我们可以通过总结每一种生物数据文件格式的处理方法来学习生物信息，这样当拿到固定">
+<meta property="og:type" content="article">
+<meta property="og:title" content="fastq文件详解">
+<meta property="og:url" content="http://yoursite.com/2020/06/10/fastq%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="七星传">
+<meta property="og:description" content="从计算机的角度来说，生物的序列属于一种字符串，也是一种文本，因此生物信息分析属于文本处理范畴。文本存储为固定格式文件，生物信息的工作就是各种文本文件之间格式的转换，例如通过序列拼接将fastq转换为fasta，通过短序列比对将fastq与fasta合并为bam，通过变异检测将bam中突变位点提取出来转换为vcf。因此，我们可以通过总结每一种生物数据文件格式的处理方法来学习生物信息，这样当拿到固定">
+<meta property="og:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183829.png">
+<meta property="og:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183830.png">
+<meta property="article:published_time" content="2020-06-09T18:35:20.000Z">
+<meta property="article:modified_time" content="2020-06-09T18:38:31.474Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="网络摘抄">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183829.png">
+  
+    <link rel="alternate" href="/atom.xml" title="七星传" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">七星传</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-fastq文件详解" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/06/10/fastq%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/" class="article-date">
+  <time datetime="2020-06-09T18:35:20.000Z" itemprop="datePublished">2020-06-10</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      fastq文件详解
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>从计算机的角度来说，生物的序列属于一种字符串，也是一种文本，因此生物信息分析属于文本处理范畴。文本存储为固定格式文件，生物信息的工作就是各种文本文件之间格式的转换，例如通过序列拼接将fastq转换为fasta，通过短序列比对将fastq与fasta合并为bam，通过变异检测将bam中突变位点提取出来转换为vcf。因此，我们可以通过总结每一种生物数据文件格式的处理方法来学习生物信息，这样当拿到固定格式的文件之后，就知道该如何来处理了。</p>
+</blockquote>
+<p><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183829.png" alt="image-20191221044407257"></p>
+<p>fastq格式是一种包含质量值的序列文件，其中的q为quality,一般用来存储原始测序数据，扩展名一般为fastq或者fq。目前illumina测序，BGISEQ，Ion Torrent，pacbio，nanopore都以fastq格式存储测序数据，其中illumina，BGISEQ一般是双末端测序，一般是一对文件，命名为<strong>_R1.fq.gz与</strong>_R2.fq.gz。下面是fastq格式常见的序列格式。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@FCD056DACXX:3:1101:2163:1959#TCGCCGTG&#x2F;1TCCGATAACGCTCAACCAGAGGGCTGCCAGCTCCGATCGGCAGTTGCAACCCATTGGCCGTCTGAGCCAGCAACCCCGGA+gggiiiiiiiiiiiiiiiiiiiiiiiiiigggggeeecccccc^bcbcccccccbccccc]aaccbbccc^R^^acccc_@FCD056DACXX:3:1101:2194:1984#TCGCCGTG&#x2F;1AGACGACGACTTCGTTTCCCGCCGCGAGTTGCGCCATGATCGCGGTGTGCAGATTCGTTACGCCCTGGGCCACGGAGACG+gggiihiiiiiiiihiiiiiiiiiigeccccccccccccccccccaccccdcccccccccccacc_accccccccccV^^</span><br></pre></td></tr></table></figure>
+
+<p>第一行：以‘@’开头，是这一条read的名字，这个字符串是根据测序时的状态信息转换过来的，中间不会有空格，它是每一条read的唯一标识符，同一份FASTQ文件中不会重复出现，甚至不同的FASTQ文件里也不会有重复；<br>第二行：测序read的序列，由A，C，G，T和N这五种字母构成，这也是我们真正关心的DNA序列，N代表的是测序时那些无法被识别出来的碱基；<br>第三行：以’+’开头，在旧版的FASTQ文件中会直接重复第一行的信息，但现在一般什么也不加（节省存储空间）；<br>第四行：测序read的质量值，这个和第二行的碱基信息一样重要，它描述的是每个测序碱基的可靠程度，用ASCII码表示。</p>
+<p>质量值</p>
+<p>上面提到fastq格式中的q代表质量值，因此fastq格式中质量值具有重要的作用，在很多的分析中会用到这个质量值，例如数据质控，数据过滤，序列拼接，短序列比对，变异检测中都要用到这个质量值。<br>这个质量值是基于phred质量值体系，但是由于单个碱基无法与两位的质量值相匹配，例如A碱基对应的质量值为40，一个A字符对应两个字符40，因此需要将原始质量值加上33或者64，在转换为对应的ASCII码值，为何加33，因为33以下ASCII码无法用键盘字符表示出来。illumina测序1.8版本以上加33，以下加64。</p>
+<p><img src="https://zhsh006-1257137335.cos.ap-chengdu.myqcloud.com/2020-06-09-183830.png" alt="image-20191221044515183"></p>
+<p>获取fastq文件</p>
+<p>可以直接拿DNA，选择合适的测序方式，就可以得到fastq格式文件，无论人，动物，植物，微生物，测序的是全基因组，还是外显子，捕获序列，抑或是RNA样本，FFPE样本最终得到的都是fatsq格式文件。注意，有些平台得到的是两个文件，reads1与reads2，有些平台得到的是一个文件。如何自己没有测序，也可以在NCBI SRA数据库下载测序文件，使用sratools工具中的prefetch或者fastq-dump软件都可以下载fastq文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">prefetch SRR8651554</span><br></pre></td></tr></table></figure>
+
+<p>将sra转为为fastq</p>
+<p>利用fastq-dump文件可以将sra文件直接转换为fastq格式，注意，如果是illumina的双末端测序，需要添加 –split-files选项，如果需要压缩格式，需要添加 –gzip选项。最终会生成SRR8651554_1.fastq.gz，SRR8651554_2.fastq.gz两个文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fastq-dump --split-files --gzip ~&#x2F;ncbi&#x2F;public&#x2F;sra&#x2F;SRR8651554.sra</span><br></pre></td></tr></table></figure>
+
+<p>压缩与解压缩</p>
+<p>目前绝大部分的软件都可以直接处理压缩格式，因此一般的fastq格式都是压缩格式呈现的，扩展名为fq.gz，如果需要压缩或者解压缩可以使用以下命令。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#解压缩</span><br><span class="line">gunzip SRR8651554_1.fastq.gz</span><br><span class="line">gzip -d  SRR8651554_2.fastq.gz</span><br><span class="line">#压缩</span><br><span class="line">gzip SRR8651554_1.fastq</span><br><span class="line">gzip SRR8651554_2.fastq</span><br></pre></td></tr></table></figure>
+
+<p>未完待续……</p>
+<p>———- END ———-</p>
+<blockquote>
+<p>从计算机的角度来说，生物的序列属于一种字符串，也是一种文本，因此生物信息分析属于文本处理范畴。文本存储为固定格式文件，生物信息的工作就是各种文本文件之间格式的转换，例如通过序列拼接将fastq转换为fasta，通过短序列比对将fastq与fasta合并为bam，通过变异检测将bam中突变位点提取出来转换为vcf。因此，我们可以通过总结每一种生物数据文件格式的处理方法来学习生物信息，这样当拿到固定格式的文件之后，就知道该如何来处理了。</p>
+</blockquote>
+<p>完整性校验</p>
+<p>完整性检验主要是为了保证文件在传输过程中保持完整，没有丢失内容，一般采用md5校验方式，目前测序公司给定的测序数据都带有md5文件，这样文件就是用来校验数据完整性的。可以使用md5sum -c命令检测这个文件，如果返回OK，说明文件完整。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">md5sum -c SRR8651554_1.fastq.md5md5sum -c SRR8651554_5.fastq.md5</span><br></pre></td></tr></table></figure>
+
+<p>fastq文件统计</p>
+<p>如果想对fastq文件进行统计，例如统计序列条数，碱基总数，reads读长分布等，可以使用seqkit工具进行操作。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ seqkit stats SRR8651554_1.fastq.gz SRR8651554_2.fastq.gz</span><br><span class="line">file                   format  type   num_seqs      sum_len  min_len  avg_len  max_len</span><br><span class="line">SRR8651554_1.fastq.gz  FASTQ   DNA   6,383,147  957,472,050      150      150      150</span><br><span class="line">SRR8651554_2.fastq.gz  FASTQ   DNA   6,383,147  957,472,050      150      150      150</span><br></pre></td></tr></table></figure>
+
+<p>如果想统计fastq文件每条序列ATCG四种碱基组成以及质量值分布，可以使用seqtk comp工具来完成。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">seqtk comp SRR8651554_1.fastq.gz SRR8651554_2.fastq.gz</span><br></pre></td></tr></table></figure>
+
+<p>如果按照位点进行统计，例如统计第一个位点所有序列ATCG以及质量值分布，可以适应seqtk fqchk命令。fqchk的结果可以用来绘制碱基质量以及含量分布图。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">seqtk fqchk SRR8651554_1.fastq.gz</span><br></pre></td></tr></table></figure>
+
+<p>合并文件</p>
+<p>如果有多个fastq文件，可以使用seqtk mergerpe进行合并，其实cat或者zcat也可以合并，不过seqtk的合并方式有一些差别，cat是将一个文件追加到另一个文件结尾，seqtk mergerpe是每次取文件一个单位合并。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">seqtk mergepe SRR8651554_1.fastq.gz SRR8651554_2.fastq.gz | head -20</span><br></pre></td></tr></table></figure>
+
+<p>———- END ———-</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/06/10/fastq%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/" data-id="ckb8a0z8d000n1lhjd97c06uq" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E6%91%98%E6%8A%84/" rel="tag">网络摘抄</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/06/10/%E9%80%9A%E8%BF%87%E5%85%A8%E5%9F%BA%E5%9B%A0%E7%BB%84%E7%BB%84%E8%9B%8B%E7%99%BDH3K27%E4%B9%99%E9%85%B0%E5%8C%96%E7%9A%84%E7%89%B9%E5%BE%81%E5%88%86%E6%9E%90%E5%B0%8F%E9%BC%A0%E9%A5%AE%E9%A3%9F%E8%AF%B1%E5%AF%BC%E7%9A%84%E8%82%A5%E8%83%96%E7%97%87%E4%B8%AD%E8%83%B0%E8%85%BA%CE%B2%E7%BB%86%E8%83%9E%E4%B8%AD%E7%9A%84%E8%84%82%E8%82%AA%E9%85%B8%E4%BF%A1%E5%8F%B7%E4%BC%A0%E5%AF%BC/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          通过全基因组组蛋白H3K27乙酰化的特征分析小鼠饮食诱导的肥胖症中胰腺β细胞中的脂肪酸信号传导
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/06/10/%E9%A6%96%E6%AC%A1%E5%AF%B9%E9%98%BF%E5%B0%94%E8%8C%A8%E6%B5%B7%E9%BB%98%E7%97%87%E8%BF%9B%E8%A1%8C%E5%85%A8%E5%9F%BA%E5%9B%A0%E7%BB%84%E8%8C%83%E5%9B%B4H3K27ac%E5%8F%98%E5%8C%96%E7%A0%94%E7%A9%B6/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">首次对阿尔茨海默症进行全基因组范围H3K27ac变化研究</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux%E8%BD%AF%E4%BB%B6/" rel="tag">Linux软件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E6%91%98%E6%8A%84/" rel="tag">网络摘抄</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Linux%E8%BD%AF%E4%BB%B6/" style="font-size: 10px;">Linux软件</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E6%91%98%E6%8A%84/" style="font-size: 20px;">网络摘抄</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/06/10/RNA-seq%E4%B8%8EChIP-seq%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B8%8E%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%8A%E7%AF%87%EF%BC%89/">RNA-seq与ChIP-seq数据处理与分析实战（上篇）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/RNA-seq%E4%B8%8EChIP-seq%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B8%8E%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%AD%E7%AF%87%EF%BC%89/">RNA-seq与ChIP-seq数据处理与分析实战（中篇）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/ChIP-Seq%E5%88%86%E6%9E%90%E5%B0%8F%E5%AE%9E%E6%88%98%EF%BC%88%E4%BA%8C%EF%BC%89/">ChIP-Seq分析小实战（二）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/ChIP-Seq%E5%88%86%E6%9E%90%E5%B0%8F%E5%AE%9E%E6%88%98%EF%BC%88%E4%B8%80%EF%BC%89/">ChIP-Seq分析小实战（一）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/10/BETA%E8%BD%AF%E4%BB%B6%E7%9A%84%E6%95%B4%E5%90%88Chip-seq%E5%92%8CRNA-seq/">BETA软件的整合Chip-seq和RNA-seq</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
